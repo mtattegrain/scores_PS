@@ -11,7 +11,7 @@
 :root{font-family:Arial,sans-serif;color:#17243b;background:#f5f7fb}*{box-sizing:border-box}body{margin:0}header{background:#163b70;color:white;padding:18px 24px}h1{margin:0;font-size:1.45rem}header p{margin:6px 0 0;color:#dce8f8}.wrap{padding:20px;max-width:1800px;margin:auto}.panel{background:white;border-radius:12px;padding:16px;box-shadow:0 2px 12px #102a4912;margin-bottom:16px}button,input{font:inherit}button{border:0;background:#175ca5;color:white;border-radius:7px;padding:9px 13px;cursor:pointer}button:hover{background:#124780}button:disabled{opacity:.55;cursor:wait}#login{display:flex;flex-wrap:wrap;gap:10px}#login input{padding:10px;border:1px solid #bac7d8;border-radius:7px;min-width:210px}#app{display:none}.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between}.toolbar>div{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.muted{color:#53647c}#message{min-height:1.5em;margin:10px 0}#message.error{color:#aa2323}.table-scroll{overflow:auto;max-height:72vh;border:1px solid #d8e0ec;border-radius:9px}table{border-collapse:separate;border-spacing:0;font-size:13px;min-width:1500px;width:max-content}th,td{border-right:1px solid #e1e6ee;border-bottom:1px solid #e1e6ee;text-align:center;padding:5px 6px;white-space:nowrap}thead th{position:sticky;top:0;background:#e9f0fa;z-index:2;padding:12px 7px}th:first-child,td:first-child{position:sticky;left:0;z-index:1;background:#fff;text-align:left;min-width:125px}thead th:first-child{z-index:3;background:#dce8f8}tbody tr:nth-child(even) td{background:#f8fafc}tbody tr:nth-child(even) td:first-child{background:#f8fafc}td input{width:55px;border:1px solid transparent;background:transparent;text-align:center;padding:7px 2px;border-radius:4px;color:inherit}td input.nom-eleve{width:155px;text-align:left;padding-left:8px}td input:focus{outline:2px solid #2672c9;background:white}td input:disabled{opacity:.6}td.calculated{background:#e8f5e9!important;font-weight:bold}td.total{background:#d5e9ff!important;font-weight:bold}td.saving{background:#fff1bd!important}td.failed{background:#ffe0e0!important}.group{font-size:11px;color:#65768b;display:block;font-weight:normal;margin-top:3px}.hint{font-size:13px;color:#526178;margin:12px 0 0}@media(max-width:600px){.wrap{padding:10px}.panel{padding:12px}}
 
 .student-link{display:block;margin-top:5px;background:#edf4ff;color:#164c88;font-size:11px;padding:5px 8px}.student-link:hover{background:#d9eaff;color:#123c6e}
-#suivi{display:none;position:fixed;inset:0;background:#0a1d36a8;z-index:20;overflow:auto;padding:22px}#suivi.open{display:block}.suivi-card{max-width:900px;margin:15px auto;background:white;border-radius:14px;padding:22px;box-shadow:0 10px 45px #0003}.suivi-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.suivi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.suivi-item{border:1px solid #dce4ef;border-radius:9px;padding:12px}.suivi-item strong{display:block;margin-bottom:6px}.suivi-item p{margin:0;font-size:13px;color:#43536b}.suivi-item.ok{border-left:5px solid #23814e}.suivi-item.no{border-left:5px solid #c44444}.suivi-item.wait{border-left:5px solid #9ca3af}.suivi-item.measure{border-left:5px solid #3e6aa6}.suivi-summary{margin:15px 0;font-weight:bold}.radar-wrap{max-width:760px;margin:18px auto}.radar-wrap canvas{width:100%;height:auto;display:block}.radar-legend{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;font-size:13px}.radar-legend span:before{content:"";display:inline-block;width:14px;height:4px;vertical-align:middle;margin-right:7px;background:var(--swatch)}.comparison{overflow:auto;margin:16px 0}.comparison table{min-width:550px;width:100%;font-size:13px}.comparison th,.comparison td{text-align:left;padding:8px}.comparison th:first-child,.comparison td:first-child{position:static}.note{font-size:13px;color:#53647c}.suivi-group{margin-top:22px}
+#suivi{display:none;position:fixed;inset:0;background:#0a1d36a8;z-index:20;overflow:auto;padding:22px}#suivi.open{display:block}.suivi-card{max-width:900px;margin:15px auto;background:white;border-radius:14px;padding:22px;box-shadow:0 10px 45px #0003}.suivi-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.suivi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.suivi-item{border:1px solid #dce4ef;border-radius:9px;padding:12px}.suivi-item strong{display:block;margin-bottom:6px}.suivi-item p{margin:0;font-size:13px;color:#43536b}.suivi-item.ok{border-left:5px solid #23814e}.suivi-item.no{border-left:5px solid #c44444}.suivi-item.wait{border-left:5px solid #9ca3af}.suivi-item.measure{border-left:5px solid #3e6aa6}.suivi-summary{margin:15px 0;font-weight:bold}.radar-wrap{max-width:840px;margin:18px auto}.radar-wrap canvas{width:100%;height:auto;display:block}.radar-legend{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;font-size:13px}.radar-legend span:before{content:"";display:inline-block;width:14px;height:4px;vertical-align:middle;margin-right:7px;background:var(--swatch)}.comparison{overflow:auto;margin:16px 0}.comparison table{min-width:550px;width:100%;font-size:14px}.comparison th,.comparison td{text-align:left;padding:8px}.comparison th:first-child,.comparison td:first-child{position:static}.note{font-size:13px;color:#53647c}.suivi-group{margin-top:22px}
 </style>
 </head>
 <body>
@@ -48,7 +48,7 @@ const descriptions={
  e1:'Trier des objets en fonction d’un critère donné',e2:'Classer des objets en fonction de caractéristiques liées à leur forme',
  e3:'Réaliser des appariements',e4:'Trier des objets en fonction de caractéristiques liées à leur volume',
  e5:'Trier des objets en fonction de caractéristiques liées à leur masse',e6:'Trier des objets en fonction de caractéristiques liées à leur longueur',
- e7a:'Réaliser un encastrement simple ou complexe',
+ e7a:'Réaliser un encastrement simple ou complexe',e7b:'Je réalise un puzzle inconnu de X pièces sans modèle',
  f1:'Nommer les lettres de l’alphabet en majuscules',f2:'Nommer les cartes vocabulaire',
  f3a:'Reconnaître son prénom en majuscules',f3b:'Reconnaître son prénom en minuscules',
  couleurs:'Couleurs',histoire:'Histoire'
@@ -56,7 +56,8 @@ const descriptions={
 // Références de représentation : valeur correspondant à 100 % sur le radar.
 // Les valeurs au-dessus de la référence restent visibles dans le tableau détaillé,
 // mais sont plafonnées à 100 % sur le radar.
-const radarReferences={e7a:2,e7b:30,f1:26,f2:40,d1:50};
+const radarReferences={e7a:2,e7b:30,f1:26,f2:40,d1:50,couleurs:11};
+function scoreLabel(field,v){if(!isEvaluated(v))return 'Non évalué';return Object.hasOwn(radarReferences,field)?String(v)+'/'+radarReferences[field]:String(v);}
 function normalized(field,value){
  if(!isEvaluated(value))return null;
  return Math.max(0,Math.min(1,Number(value)/(radarReferences[field]||1)));
@@ -90,10 +91,10 @@ function addComparison(pane,row){
  addText(section,'p','La toile d’araignée combine compétences binaires et mesures sur une échelle de 0 à 100 %. Références graphiques (100 %) : E7A = 2, E7B = 30, F1 = 26, F2 = 40, D1 = 50. Les valeurs dépassant leur référence sont plafonnées à 100 % sur le radar, mais leurs scores bruts sont conservés. Le bleu représente l’élève et l’orange la moyenne de classe. Les cases vides sont exclues des moyennes ; elles ne constituent pas un échec.','note');
  const wrap=document.createElement('div');wrap.className='radar-wrap';const canvas=document.createElement('canvas');canvas.setAttribute('role','img');canvas.setAttribute('aria-label','Graphique radar comparant les compétences binaires et les mesures normalisées de l’élève et de la classe');wrap.append(canvas);
  const legend=document.createElement('div');legend.className='radar-legend';legend.innerHTML='<span style="--swatch:#1769b3">Élève</span><span style="--swatch:#e58b2a">Moyenne de classe</span>';wrap.append(legend);section.append(wrap);
- const div=document.createElement('div');div.className='comparison';const table=document.createElement('table');const head=document.createElement('thead');const hr=document.createElement('tr');['Item et compétence','Élève','Référence','Moyenne classe','Évalués'].forEach(t=>addText(hr,'th',t));head.append(hr);table.append(head);const body=document.createElement('tbody');
- for(const field of radarFields){const a=itemAverage(field);const tr=document.createElement('tr');[field.toUpperCase()+' — '+(descriptions[field]||''),isEvaluated(row[field])?(measures.has(field)?String(row[field]):displayStatus(field,row[field])):'Non évalué',referenceLabel(field),a.average===null?'—':(radarMean(field)*100).toFixed(1).replace('.',',')+' %',String(a.count)+' / '+allStudents.length].forEach(t=>addText(tr,'td',t));body.append(tr);}table.append(body);div.append(table);section.append(div);
+ const div=document.createElement('div');div.className='comparison';const table=document.createElement('table');const head=document.createElement('thead');const hr=document.createElement('tr');['Item et compétence','Score','Référence','Moyenne classe'].forEach(t=>addText(hr,'th',t));head.append(hr);table.append(head);const body=document.createElement('tbody');
+ for(const field of radarFields){const a=itemAverage(field);const tr=document.createElement('tr');[field.toUpperCase()+' — '+(descriptions[field]||''),isEvaluated(row[field])?(measures.has(field)?scoreLabel(field,row[field]):displayStatus(field,row[field])):'Non évalué',referenceLabel(field),a.average===null?'—':(radarMean(field)*100).toFixed(1).replace('.',',')+' %'].forEach(t=>addText(tr,'td',t));body.append(tr);}table.append(body);div.append(table);section.append(div);
  addText(section,'p','Les références de D1, E7A, E7B, F1 et F2 correspondent à 100 % sur le radar. Couleurs et Histoire restent hors radar tant que leur échelle n’est pas définie. Les moyennes brutes sont affichées ci-dessous.','note');
- const measureTable=document.createElement('div');measureTable.className='comparison';const mt=document.createElement('table');const mh=document.createElement('tr');['Mesure','Résultat élève','Moyenne classe','Évalués'].forEach(t=>addText(mh,'th',t));const mhead=document.createElement('thead');mhead.append(mh);mt.append(mhead);const mb=document.createElement('tbody');for(const field of ['d1','e7a','e7b','f1','f2','couleurs','histoire']){const avg=itemAverage(field),tr=document.createElement('tr');[field.toUpperCase()+' — '+(descriptions[field]||''),isEvaluated(row[field])?String(row[field]):'Non évalué',avg.average===null?'—':avg.average.toFixed(1).replace('.',','),avg.count+' / '+allStudents.length].forEach(t=>addText(tr,'td',t));mb.append(tr);}mt.append(mb);measureTable.append(mt);section.append(measureTable);
+ const measureTable=document.createElement('div');measureTable.className='comparison';const mt=document.createElement('table');const mh=document.createElement('tr');['Mesure','Score','Moyenne classe'].forEach(t=>addText(mh,'th',t));const mhead=document.createElement('thead');mhead.append(mh);mt.append(mhead);const mb=document.createElement('tbody');for(const field of ['d1','e7a','e7b','f1','f2','couleurs','histoire']){const avg=itemAverage(field),tr=document.createElement('tr');[field.toUpperCase()+' — '+(descriptions[field]||''),scoreLabel(field,row[field]),avg.average===null?'—':avg.average.toFixed(1).replace('.',',')].forEach(t=>addText(tr,'td',t));mb.append(tr);}mt.append(mb);measureTable.append(mt);section.append(measureTable);
  pane.prepend(section);renderRadar(canvas,row);
 }
 
@@ -111,7 +112,7 @@ function showStudent(row){
  if(empty){status='Non évalué';detail='Aucun résultat renseigné';cls='wait';pending++;}
  else if(field==='e7a'){status='Mesure renseignée';detail='Niveau : '+val+' / 2 — '+displayStatus(field,val);cls='measure';}
  else if(measures.has(field)){
- if(Object.hasOwn(limits,field)){const good=Number(val)>=limits[field];status='Mesure renseignée';detail='Résultat : '+val+' — '+(good?'seuil de bonus atteint':'seuil de bonus non atteint')+' ('+limits[field]+')';cls='measure';}
+ if(Object.hasOwn(limits,field)){const good=Number(val)>=limits[field];status=good?'Acquis':'Non acquis';detail='Résultat : '+scoreLabel(field,val)+' — critère de réussite : '+limits[field];cls=good?'ok':'no';}
  else{status='Mesure renseignée';detail='Résultat : '+val+' — aucun seuil de réussite défini';cls='measure';}
  }else if(Number(val)===1){status='Acquis';detail='Résultat : 1';cls='ok';acquired++;}
  else if(Number(val)===0){status='Non acquis';detail='Résultat : 0';cls='no';failed++;}
@@ -137,7 +138,7 @@ function styleSheet(ws,headerRow=1){
 }
 function downloadWorkbook(workbook,filename){return workbook.xlsx.writeBuffer().then(buffer=>{const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=filename;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);});}
 function groupFor(field){return groups.find(g=>g[1].includes(field))?.[0]||'';}
-function itemStatus(field,v){if(!isEvaluated(v))return 'Non évalué';if(measures.has(field)){if(Object.hasOwn(limits,field))return Number(v)>=limits[field]?'Seuil de bonus atteint':'Seuil de bonus non atteint';return 'Mesure renseignée';}return Number(v)===1?'Acquis':Number(v)===0?'Non acquis':'À vérifier';}
+function itemStatus(field,v){if(!isEvaluated(v))return 'Non évalué';if(measures.has(field)){if(Object.hasOwn(limits,field))return Number(v)>=limits[field]?'Acquis':'Non acquis';return 'Mesure renseignée';}return Number(v)===1?'Acquis':Number(v)===0?'Non acquis':'À vérifier';}
 function classAverageText(field){const a=itemAverage(field);return a.average===null?null:(measures.has(field)?Number(a.average.toFixed(2)):Number((radarMean(field)*100).toFixed(1)));}
 function createClassWorkbook(){
  const wb=new ExcelJS.Workbook();wb.creator='Évaluations PS';wb.created=new Date();
@@ -152,12 +153,12 @@ function createClassWorkbook(){
 }
 function createStudentWorkbook(student){
  const wb=new ExcelJS.Workbook();wb.creator='Évaluations PS';wb.created=new Date();
- const ws=wb.addWorksheet('Bilan individuel');ws.mergeCells('A1:G1');ws.getCell('A1').value='Bilan individuel — '+student.eleve;ws.getCell('A1').font={bold:true,size:17,color:{argb:'FF174A7E'}};ws.getRow(1).height=30;
+ const ws=wb.addWorksheet('Bilan individuel');ws.mergeCells('A1:F1');ws.getCell('A1').value='Bilan individuel — '+student.eleve;ws.getCell('A1').font={bold:true,size:17,color:{argb:'FF174A7E'}};ws.getRow(1).height=30;
  ws.getCell('A2').value='Total sur 26';ws.getCell('B2').value=excelValue(student.sur_26);
  ws.getCell('D2').value='Date de l’export';ws.getCell('E2').value=excelDate();
- ws.addRow([]);ws.addRow(['Domaine','Item','Description de la compétence','Résultat','Statut','Moyenne classe','Évalués']);
- for(const field of cols){if(computed.has(field))continue;const a=itemAverage(field);ws.addRow([groupFor(field),field.toUpperCase(),descriptions[field]||'',excelValue(student[field]),itemStatus(field,student[field]),classAverageText(field),a.count+' / '+allStudents.length]);}
- ws.columns=[{width:16},{width:13},{width:78},{width:15},{width:30},{width:20},{width:17}];styleSheet(ws,4);ws.autoFilter='A4:G4';
+ ws.addRow([]);ws.addRow(['Domaine','Item','Description de la compétence','Score','Statut','Moyenne classe']);
+ for(const field of cols){if(computed.has(field))continue;const a=itemAverage(field);ws.addRow([groupFor(field),field.toUpperCase(),descriptions[field]||'',scoreLabel(field,student[field]),itemStatus(field,student[field]),classAverageText(field)]);}
+ ws.columns=[{width:16},{width:13},{width:78},{width:15},{width:30},{width:20}];styleSheet(ws,4);ws.autoFilter='A4:F4';
  ws.addRow([]);ws.addRow(['Les moyennes des compétences binaires sont en pourcentage ; les mesures restent en unités brutes. Radar : références 100 % D1=50, E7A=2, E7B=30, F1=26, F2=40.']);
  const chart=wb.addWorksheet('Graphique radar');chart.getCell('A1').value='Comparaison des compétences et mesures (normalisées)' ;chart.getCell('A1').font={size:16,bold:true};
  chart.getCell('A2').value='Bleu : élève — Orange : moyenne de classe. Mesures ramenées à 100 % par références graphiques. Les items non évalués sont exclus des moyennes.';
@@ -219,20 +220,20 @@ function exportStudentPdf(){
  const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a3'});
  pdfHeader(doc,'Bilan individuel — '+student.eleve,'Total : '+pdfText(student.sur_26)+'/26 · Comparaison avec la classe');
  const canvas=document.createElement('canvas');renderRadar(canvas,student);
- const img=canvas.toDataURL('image/png');doc.addImage(img,'PNG',10,43,155,155);
- doc.setFontSize(8);doc.setTextColor(30,70,110);doc.text('Bleu : élève',16,207);
- doc.setTextColor(180,105,30);doc.text('Orange : moyenne de classe',57,207);
+ const img=canvas.toDataURL('image/png');doc.addImage(img,'PNG',7,41,168,168);
+ doc.setFontSize(8);doc.setTextColor(30,70,110);doc.text('Bleu : élève',16,215);
+ doc.setTextColor(180,105,30);doc.text('Orange : moyenne de classe',57,215);
  doc.setTextColor(75,85,100);doc.setFontSize(7);
- doc.text(doc.splitTextToSize('Radar : compétences binaires et mesures normalisées (D1/50, E7A/2, E7B/30, F1/26, F2/40). Références 100 % du radar. Les valeurs absentes sont exclues des moyennes.',151),12,217);
+ doc.text(doc.splitTextToSize('Radar : compétences binaires et mesures normalisées (D1/50, E7A/2, E7B/30, F1/26, F2/40). Les valeurs absentes sont exclues des moyennes.',160),10,225);
  const rows=cols.filter(f=>!computed.has(f)).map(f=>{
  const a=itemAverage(f);const mean=a.average===null?'—':measures.has(f)?a.average.toFixed(2).replace('.',','):(radarMean(f)*100).toFixed(1).replace('.',',')+' %';
- return [f.toUpperCase(),descriptions[f]||'—',isEvaluated(student[f])?String(student[f]):'—',itemStatus(f,student[f]),mean,a.count+' / '+allStudents.length];
+ return [f.toUpperCase(),descriptions[f]||'—',scoreLabel(f,student[f]),itemStatus(f,student[f]),mean];
  });
- doc.autoTable({head:[['Item','Compétence','Score','État','Classe','Évalués']],body:rows,startY:36,
- margin:{left:173,right:9,top:36,bottom:14},tableWidth:235,theme:'grid',
- styles:{font:'helvetica',fontSize:6.8,cellPadding:1.1,overflow:'linebreak',valign:'middle',minCellHeight:6},
+ doc.autoTable({head:[['Item','Compétence','Score','État','Classe']],body:rows,startY:36,
+ margin:{left:180,right:8,top:36,bottom:14},tableWidth:232,theme:'grid',
+ styles:{font:'helvetica',fontSize:7.5,cellPadding:1.15,overflow:'linebreak',valign:'middle',minCellHeight:6},
  headStyles:{fillColor:[23,74,126]},alternateRowStyles:{fillColor:[244,248,252]},
- columnStyles:{0:{cellWidth:14},1:{cellWidth:112},2:{cellWidth:15},3:{cellWidth:35},4:{cellWidth:27},5:{cellWidth:32}},
+ columnStyles:{0:{cellWidth:13},1:{cellWidth:126},2:{cellWidth:23},3:{cellWidth:37},4:{cellWidth:33}},
  pageBreak:'avoid'});
  pdfFooter(doc);
  doc.save('bilan_'+cleanFilename(student.eleve)+'_A3_'+excelDate()+'.pdf');
