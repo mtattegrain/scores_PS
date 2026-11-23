@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Évaluations PS — Tableau partagé</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{font-family:Arial,sans-serif;color:#17243b;background:#f5f7fb}*{box-sizing:border-box}body{margin:0}header{background:#163b70;color:white;padding:18px 24px}h1{margin:0;font-size:1.45rem}header p{margin:6px 0 0;color:#dce8f8}.wrap{padding:20px;max-width:1800px;margin:auto}.panel{background:white;border-radius:12px;padding:16px;box-shadow:0 2px 12px #102a4912;margin-bottom:16px}button,input{font:inherit}button{border:0;background:#175ca5;color:white;border-radius:7px;padding:9px 13px;cursor:pointer}button:hover{background:#124780}button:disabled{opacity:.55;cursor:wait}#login{display:flex;flex-wrap:wrap;gap:10px}#login input{padding:10px;border:1px solid #bac7d8;border-radius:7px;min-width:210px}#app{display:none}.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between}.toolbar>div{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.muted{color:#53647c}#message{min-height:1.5em;margin:10px 0}#message.error{color:#aa2323}.table-scroll{overflow:auto;max-height:72vh;border:1px solid #d8e0ec;border-radius:9px}table{border-collapse:separate;border-spacing:0;font-size:13px;min-width:1500px;width:max-content}th,td{border-right:1px solid #e1e6ee;border-bottom:1px solid #e1e6ee;text-align:center;padding:5px 6px;white-space:nowrap}thead th{position:sticky;top:0;background:#e9f0fa;z-index:2;padding:12px 7px}th:first-child,td:first-child{position:sticky;left:0;z-index:1;background:#fff;text-align:left;min-width:125px}thead th:first-child{z-index:3;background:#dce8f8}tbody tr:nth-child(even) td{background:#f8fafc}tbody tr:nth-child(even) td:first-child{background:#f8fafc}td input{width:55px;border:1px solid transparent;background:transparent;text-align:center;padding:7px 2px;border-radius:4px;color:inherit}td input.nom-eleve{width:155px;text-align:left;padding-left:8px}td input:focus{outline:2px solid #2672c9;background:white}td input:disabled{opacity:.6}td.calculated{background:#e8f5e9!important;font-weight:bold}td.total{background:#d5e9ff!important;font-weight:bold}td.saving{background:#fff1bd!important}td.failed{background:#ffe0e0!important}.group{font-size:11px;color:#65768b;display:block;font-weight:normal;margin-top:3px}.hint{font-size:13px;color:#526178;margin:12px 0 0}@media(max-width:600px){.wrap{padding:10px}.panel{padding:12px}}
+</style>
+</head>
+<body>
+<header><h1>Évaluations — Petite Section</h1><p>Tableau partagé des compétences et résultats</p></header>
+<main class="wrap">
+<section id="connexion" class="panel"><h2>Connexion</h2><form id="login"><input id="email" type="email" placeholder="Adresse e-mail" autocomplete="username" required><input id="password" type="password" placeholder="Mot de passe" autocomplete="current-password" required><button type="submit">Se connecter</button></form></section>
+<p id="message" role="status" aria-live="polite"></p>
+<section id="app"><div class="panel toolbar"><div><strong id="count">Élèves</strong><span class="muted">Les noms et les notes sont enregistrés automatiquement.</span></div><div><button id="refresh" type="button">Actualiser</button><button id="logout" type="button">Se déconnecter</button></div></div><div class="panel"><div class="table-scroll"><table><thead id="entetes"></thead><tbody id="lignes"></tbody></table></div><p class="hint">Clique sur un nom pour le modifier, puis appuie sur Entrée ou clique ailleurs pour enregistrer. Déplace le tableau horizontalement pour voir toutes les compétences. Les cellules vertes correspondent aux bonus calculés ; la colonne bleue est le total sur 26. Vide une cellule pour enregistrer une valeur non renseignée.</p></div></section>
+</main>
+<script>
+const SUPABASE_URL='https://ghmjtvtdpqwfyuxenmzv.supabase.co';
+const SUPABASE_KEY='sb_publishable_LGzmobJKP3W9nVyqerYbdA_aIBhqODq';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const groups=[
+ ['A',['a1a','a1b','a2','a3']],['B',['b1','b2','b3','b4a','b4b']],['C',['c1','c2']],
+ ['D',['d1','bonus','d2a','d2b','d2c']],
+ ['E',['e1','e2','e3','e4','e5','e6','e7a','e7b','bonus_e7b']],
+ ['F',['f1','f2','bonus_f2','f3a','f3b']],
+ ['Autres',['couleurs','histoire']],['Total',['sur_26']]
+];
+const cols=groups.flatMap(g=>g[1]);
+const computed=new Set(['bonus','bonus_e7b','bonus_f2','sur_26']);
+const labels={bonus:'Bonus D1',bonus_e7b:'Bonus E7B',bonus_f2:'Bonus F2',sur_26:'Sur 26',couleurs:'Couleurs',histoire:'Histoire'};
+const message=document.getElementById('message');
+const tbody=document.getElementById('lignes');
+let loggedIn=false,dirty=new Set(),loading=false;
+function info(text,isError=false){message.textContent=text;message.className=isError?'error':'';}
+function renderHeader(){const tr=document.createElement('tr');const th=document.createElement('th');th.textContent='Élève';tr.append(th);for(const [group,fields] of groups){for(const field of fields){const cell=document.createElement('th');cell.textContent=labels[field]||field.toUpperCase();const small=document.createElement('span');small.className='group';small.textContent=group;cell.append(small);tr.append(cell);}}document.getElementById('entetes').replaceChildren(tr);}
+function cellText(v){return v===null||v===undefined?'':String(v);}
+async function loadScores(){if(!loggedIn||loading||dirty.size)return;loading=true;const {data,error}=await db.from('eva_scores').select('*').order('id',{ascending:true});loading=false;if(error){info('Erreur de lecture : '+error.message,true);return;}const frag=document.createDocumentFragment();for(const row of data){const tr=document.createElement('tr');const name=document.createElement('td');const nameInput=document.createElement('input');nameInput.type='text';nameInput.className='nom-eleve';nameInput.maxLength=100;nameInput.value=row.eleve||'';nameInput.dataset.original=nameInput.value;nameInput.setAttribute('aria-label','Nom de l’élève');nameInput.addEventListener('change',()=>saveName(row.id,nameInput,name));name.append(nameInput);tr.append(name);for(const field of cols){const td=document.createElement('td');if(computed.has(field)){td.textContent=cellText(row[field]);td.className=field==='sur_26'?'total':'calculated';}else{const input=document.createElement('input');input.type='number';input.step='1';input.min='0';input.setAttribute('aria-label',`${row.eleve} — ${labels[field]||field.toUpperCase()}`);input.value=cellText(row[field]);input.dataset.original=input.value;input.addEventListener('change',()=>saveValue(row.id,field,input,td));td.append(input);}tr.append(td);}frag.append(tr);}tbody.replaceChildren(frag);document.getElementById('count').textContent=`${data.length} élèves`;}
+async function saveName(id,input,td){
+ const nom=input.value.trim();
+ if(!nom){info('Le nom de l’élève ne peut pas être vide.',true);input.value=input.dataset.original;return;}
+ if(nom===input.dataset.original)return;
+ const key=id+':eleve';dirty.add(key);input.disabled=true;td.classList.add('saving');info('Enregistrement du nom…');
+ const {data,error}=await db.from('eva_scores').update({eleve:nom}).eq('id',id).select('id,eleve');
+ input.disabled=false;td.classList.remove('saving');dirty.delete(key);
+ if(error||!data?.length){td.classList.add('failed');input.value=input.dataset.original;info('Impossible de modifier le nom : '+(error?.message||'vérifie les droits de modification Supabase.'),true);return;}
+ td.classList.remove('failed');input.dataset.original=nom;input.value=nom;info('Nom enregistré.');await loadScores();
+}
+async function saveValue(id,field,input,td){const raw=input.value.trim();if(raw!==''&&(!/^\d+$/.test(raw)||!Number.isSafeInteger(Number(raw)))){info('Saisis un nombre entier positif ou laisse la case vide.',true);input.value=input.dataset.original;return;}if(raw===input.dataset.original)return;const value=raw===''?null:Number(raw);const key=id+':'+field;dirty.add(key);input.disabled=true;td.classList.add('saving');info('Enregistrement en cours…');const {error}=await db.from('eva_scores').update({[field]:value}).eq('id',id).select('id');input.disabled=false;td.classList.remove('saving');dirty.delete(key);if(error){td.classList.add('failed');input.value=input.dataset.original;info('Enregistrement impossible : '+error.message,true);return;}td.classList.remove('failed');input.dataset.original=raw;info('Modification enregistrée.');await loadScores();}
+async function updateSession(){const {data,error}=await db.auth.getSession();if(error){info('Erreur de session : '+error.message,true);}loggedIn=!!data?.session;document.getElementById('connexion').style.display=loggedIn?'none':'block';document.getElementById('app').style.display=loggedIn?'block':'none';if(loggedIn)await loadScores();else tbody.replaceChildren();}
+document.getElementById('login').addEventListener('submit',async e=>{e.preventDefault();const button=e.target.querySelector('button');button.disabled=true;const {error}=await db.auth.signInWithPassword({email:document.getElementById('email').value,password:document.getElementById('password').value});button.disabled=false;if(error)info('Connexion impossible : vérifie tes identifiants.',true);else{info('Connexion réussie.');await updateSession();}});
+document.getElementById('logout').addEventListener('click',async()=>{const {error}=await db.auth.signOut();if(error)info('Déconnexion impossible : '+error.message,true);else{info('Tu es déconnecté.');await updateSession();}});
+document.getElementById('refresh').addEventListener('click',()=>loadScores());
+db.auth.onAuthStateChange((event)=>{if(event==='SIGNED_IN'||event==='SIGNED_OUT')setTimeout(updateSession,0);});
+db.channel('eva-scores-live').on('postgres_changes',{event:'*',schema:'public',table:'eva_scores'},()=>{if(loggedIn)loadScores();}).subscribe();
+// Synchronisation de secours si Realtime n'est pas activé dans Supabase.
+setInterval(()=>{if(loggedIn&&document.visibilityState==='visible')loadScores();},15000);
+renderHeader();updateSession();
+</script>
+</body></html>
