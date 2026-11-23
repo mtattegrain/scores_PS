@@ -35,7 +35,7 @@ const groups=[
 ];
 const cols=groups.flatMap(g=>g[1]);
 const computed=new Set(['bonus','bonus_e7b','bonus_f2','sur_26']);
-const labels={bonus:'Bonus D1',bonus_e7b:'Bonus E7B',bonus_f2:'Bonus F2',sur_26:'Sur 26',couleurs:'Couleurs',histoire:'Histoire'};
+const labels={bonus:'Bonus D1',bonus_e7b:'Bonus E7B',bonus_f2:'Bonus F2',sur_26:'Sur 26',couleurs:'Dire le nom des couleurs',histoire:'Dire les mots-clés de l’histoire apprise en classe'};
 const descriptions={
  a1a:'Comparer deux collections (le moins)',a1b:'Comparer deux collections (le plus)',
  a2:'Réaliser une correspondance terme à terme',a3:'Produire une collection de même cardinal qu’une autre',
@@ -51,13 +51,13 @@ const descriptions={
  e7a:'Réaliser un encastrement simple ou complexe',e7b:'Je réalise un puzzle inconnu de X pièces sans modèle',
  f1:'Nommer les lettres de l’alphabet en majuscules',f2:'Nommer les cartes vocabulaire',
  f3a:'Reconnaître son prénom en majuscules',f3b:'Reconnaître son prénom en minuscules',
- couleurs:'Couleurs',histoire:'Histoire'
+ couleurs:'Dire le nom des couleurs',histoire:'Dire les mots-clés de l’histoire apprise en classe'
 };
 // Références de représentation : valeur correspondant à 100 % sur le radar.
 // Les valeurs au-dessus de la référence restent visibles dans le tableau détaillé,
 // mais sont plafonnées à 100 % sur le radar.
 const radarReferences={e7a:2,e7b:30,f1:26,f2:40,d1:20,couleurs:11};
-function scoreLabel(field,v){if(!isEvaluated(v))return 'Non évalué';if(field==='e7a')return Number(v)===0?'0':Number(v)===1?'simple':Number(v)===2?'double':String(v);if(field==='d1')return String(v);if(!measures.has(field))return '';return Object.hasOwn(radarReferences,field)?String(v)+'/'+radarReferences[field]:String(v);}
+function scoreLabel(field,v){if(!isEvaluated(v))return 'Non évalué';if(field==='e7a')return Number(v)===0?'0':Number(v)===1?'simple':Number(v)===2?'double':String(v);if(field==='d1'||field==='e7b')return String(v);if(!measures.has(field))return '';return Object.hasOwn(radarReferences,field)?String(v)+'/'+radarReferences[field]:String(v);}
 function normalized(field,value){
  if(!isEvaluated(value))return null;
  return Math.max(0,Math.min(1,Number(value)/(radarReferences[field]||1)));
@@ -229,11 +229,11 @@ function exportStudentPdf(){
  const a=itemAverage(f);const mean=a.average===null?'—':measures.has(f)?a.average.toFixed(2).replace('.',','):(radarMean(f)*100).toFixed(1).replace('.',',')+' %';
  return [f.toUpperCase(),descriptions[f]||'—',scoreLabel(f,student[f]),itemStatus(f,student[f]),mean];
  });
- doc.autoTable({head:[['Item','Compétence','Score','État','Classe']],body:rows,startY:36,
+ doc.autoTable({head:[['Item','Compétence','Score','État','Taux de réussite de la classe']],body:rows,startY:36,
  margin:{left:180,right:8,top:36,bottom:14},tableWidth:232,theme:'grid',
  styles:{font:'helvetica',fontSize:7.7,cellPadding:1.15,overflow:'linebreak',valign:'middle',minCellHeight:6},
  headStyles:{fillColor:[23,74,126]},alternateRowStyles:{fillColor:[244,248,252]},
- columnStyles:{0:{cellWidth:20},1:{cellWidth:119},2:{cellWidth:23},3:{cellWidth:37},4:{cellWidth:33}},
+ columnStyles:{0:{cellWidth:20},1:{cellWidth:112},2:{cellWidth:21},3:{cellWidth:34},4:{cellWidth:45}},
  pageBreak:'avoid'});
  pdfFooter(doc);
  doc.save('bilan_'+cleanFilename(student.eleve)+'_A3_'+excelDate()+'.pdf');
