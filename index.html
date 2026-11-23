@@ -6,6 +6,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{font-family:Arial,sans-serif;color:#17243b;background:#f5f7fb}*{box-sizing:border-box}body{margin:0}header{background:#163b70;color:white;padding:18px 24px}h1{margin:0;font-size:1.45rem}header p{margin:6px 0 0;color:#dce8f8}.wrap{padding:20px;max-width:1800px;margin:auto}.panel{background:white;border-radius:12px;padding:16px;box-shadow:0 2px 12px #102a4912;margin-bottom:16px}button,input{font:inherit}button{border:0;background:#175ca5;color:white;border-radius:7px;padding:9px 13px;cursor:pointer}button:hover{background:#124780}button:disabled{opacity:.55;cursor:wait}#login{display:flex;flex-wrap:wrap;gap:10px}#login input{padding:10px;border:1px solid #bac7d8;border-radius:7px;min-width:210px}#app{display:none}.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between}.toolbar>div{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.muted{color:#53647c}#message{min-height:1.5em;margin:10px 0}#message.error{color:#aa2323}.table-scroll{overflow:auto;max-height:72vh;border:1px solid #d8e0ec;border-radius:9px}table{border-collapse:separate;border-spacing:0;font-size:13px;min-width:1500px;width:max-content}th,td{border-right:1px solid #e1e6ee;border-bottom:1px solid #e1e6ee;text-align:center;padding:5px 6px;white-space:nowrap}thead th{position:sticky;top:0;background:#e9f0fa;z-index:2;padding:12px 7px}th:first-child,td:first-child{position:sticky;left:0;z-index:1;background:#fff;text-align:left;min-width:125px}thead th:first-child{z-index:3;background:#dce8f8}tbody tr:nth-child(even) td{background:#f8fafc}tbody tr:nth-child(even) td:first-child{background:#f8fafc}td input{width:55px;border:1px solid transparent;background:transparent;text-align:center;padding:7px 2px;border-radius:4px;color:inherit}td input.nom-eleve{width:155px;text-align:left;padding-left:8px}td input:focus{outline:2px solid #2672c9;background:white}td input:disabled{opacity:.6}td.calculated{background:#e8f5e9!important;font-weight:bold}td.total{background:#d5e9ff!important;font-weight:bold}td.saving{background:#fff1bd!important}td.failed{background:#ffe0e0!important}.group{font-size:11px;color:#65768b;display:block;font-weight:normal;margin-top:3px}.hint{font-size:13px;color:#526178;margin:12px 0 0}@media(max-width:600px){.wrap{padding:10px}.panel{padding:12px}}
+
+.student-link{display:block;margin-top:5px;background:#edf4ff;color:#164c88;font-size:11px;padding:5px 8px}.student-link:hover{background:#d9eaff;color:#123c6e}
+#suivi{display:none;position:fixed;inset:0;background:#0a1d36a8;z-index:20;overflow:auto;padding:22px}#suivi.open{display:block}.suivi-card{max-width:900px;margin:15px auto;background:white;border-radius:14px;padding:22px;box-shadow:0 10px 45px #0003}.suivi-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.suivi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.suivi-item{border:1px solid #dce4ef;border-radius:9px;padding:12px}.suivi-item strong{display:block;margin-bottom:6px}.suivi-item p{margin:0;font-size:13px;color:#43536b}.suivi-item.ok{border-left:5px solid #23814e}.suivi-item.no{border-left:5px solid #c44444}.suivi-item.wait{border-left:5px solid #9ca3af}.suivi-item.measure{border-left:5px solid #3e6aa6}.suivi-summary{margin:15px 0;font-weight:bold}.radar-wrap{max-width:760px;margin:18px auto}.radar-wrap canvas{width:100%;height:auto;display:block}.radar-legend{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;font-size:13px}.radar-legend span:before{content:"";display:inline-block;width:14px;height:4px;vertical-align:middle;margin-right:7px;background:var(--swatch)}.comparison{overflow:auto;margin:16px 0}.comparison table{min-width:550px;width:100%;font-size:13px}.comparison th,.comparison td{text-align:left;padding:8px}.comparison th:first-child,.comparison td:first-child{position:static}.note{font-size:13px;color:#53647c}.suivi-group{margin-top:22px}
 </style>
 </head>
 <body>
@@ -13,8 +16,9 @@
 <main class="wrap">
 <section id="connexion" class="panel"><h2>Connexion</h2><form id="login"><input id="email" type="email" placeholder="Adresse e-mail" autocomplete="username" required><input id="password" type="password" placeholder="Mot de passe" autocomplete="current-password" required><button type="submit">Se connecter</button></form></section>
 <p id="message" role="status" aria-live="polite"></p>
-<section id="app"><div class="panel toolbar"><div><strong id="count">Élèves</strong><span class="muted">Les noms et les notes sont enregistrés automatiquement.</span></div><div><button id="refresh" type="button">Actualiser</button><button id="logout" type="button">Se déconnecter</button></div></div><div class="panel"><div class="table-scroll"><table><thead id="entetes"></thead><tbody id="lignes"></tbody></table></div><p class="hint">Clique sur un nom pour le modifier, puis appuie sur Entrée ou clique ailleurs pour enregistrer. Déplace le tableau horizontalement pour voir toutes les compétences. Les cellules vertes correspondent aux bonus calculés ; la colonne bleue est le total sur 26. Vide une cellule pour enregistrer une valeur non renseignée.</p></div></section>
+<section id="app"><div class="panel toolbar"><div><strong id="count">Élèves</strong><span class="muted">Les noms et les notes sont enregistrés automatiquement.</span></div><div><button id="refresh" type="button">Actualiser</button><button id="logout" type="button">Se déconnecter</button></div></div><div class="panel"><div class="table-scroll"><table><thead id="entetes"></thead><tbody id="lignes"></tbody></table></div><p class="hint">Clique sur un nom pour le modifier, ou sur « Voir le suivi » pour consulter les compétences réussies et non acquises. Déplace le tableau horizontalement pour voir toutes les compétences. Les cellules vertes correspondent aux bonus calculés ; la colonne bleue est le total sur 26. Vide une cellule pour enregistrer une valeur non renseignée.</p></div></section>
 </main>
+<div id="suivi" role="dialog" aria-modal="true" aria-labelledby="suivi-titre"><div class="suivi-card"><div class="suivi-head"><h2 id="suivi-titre">Suivi individuel</h2><button type="button" id="fermer-suivi">Fermer</button></div><p class="muted">Les résultats sont issus des notes enregistrées dans Supabase. Les mesures sans seuil défini ne sont pas classées en réussite ou échec.</p><div id="suivi-contenu"></div></div></div>
 <script>
 const SUPABASE_URL='https://ghmjtvtdpqwfyuxenmzv.supabase.co';
 const SUPABASE_KEY='sb_publishable_LGzmobJKP3W9nVyqerYbdA_aIBhqODq';
@@ -29,13 +33,90 @@ const groups=[
 const cols=groups.flatMap(g=>g[1]);
 const computed=new Set(['bonus','bonus_e7b','bonus_f2','sur_26']);
 const labels={bonus:'Bonus D1',bonus_e7b:'Bonus E7B',bonus_f2:'Bonus F2',sur_26:'Sur 26',couleurs:'Couleurs',histoire:'Histoire'};
+const descriptions={
+ a1a:'Comparer deux collections (le moins)',a1b:'Comparer deux collections (le plus)',
+ a2:'Réaliser une correspondance terme à terme',a3:'Produire une collection de même cardinal qu’une autre',
+ b1:'Apparier des collections de même quantité mais d’entités différentes occupant des espaces différents',
+ b2:'Reconnaître une quantité',b3:'Dire le mot-nombre correspondant au cardinal d’une collection après ajout',
+ b4a:'Dire le mot-nombre correspondant au cardinal d’une collection après retrait',
+ b4b:'Dire le mot-nombre correspondant au cardinal d’une collection après retrait',
+ c1:'Reproduire une suite identique à une suite ordonnée proposée',c2:'Ordonner des ensembles d’objets identiques',
+ d1:'Connaître la suite orale des nombres',d2a:'Montrer le chiffre 3',d2b:'Montrer le chiffre 1',d2c:'Montrer le chiffre 2',
+ e1:'Trier des objets en fonction d’un critère donné',e2:'Classer des objets en fonction de caractéristiques liées à leur forme',
+ e3:'Réaliser des appariements',e4:'Trier des objets en fonction de caractéristiques liées à leur volume',
+ e5:'Trier des objets en fonction de caractéristiques liées à leur masse',e6:'Trier des objets en fonction de caractéristiques liées à leur longueur',
+ f1:'Nommer les lettres de l’alphabet en majuscules',f2:'Nommer les cartes vocabulaire',
+ f3a:'Reconnaître son prénom en majuscules',f3b:'Reconnaître son prénom en minuscules',
+ couleurs:'Couleurs',histoire:'Histoire'
+};
+const measures=new Set(['d1','e7b','f1','f2','couleurs','histoire']);
+const limits={d1:10,e7b:9,f2:30};
+let currentStudentId=null;
+let allStudents=[];
+const radarFields=['a1a','a1b','a2','a3','b1','b2','b3','b4a','b4b','c1','c2','d2a','d2b','d2c','e1','e2','e3','e4','e5','e6','e7a','f3a','f3b'];
+function isEvaluated(v){return v!==null&&v!==undefined&&v!=='';}
+function itemAverage(field){const values=allStudents.map(r=>r[field]).filter(isEvaluated).map(Number).filter(Number.isFinite);return {count:values.length,average:values.length?values.reduce((a,b)=>a+b,0)/values.length:null};}
+function renderRadar(canvas,student){
+ const scale=2, width=720,height=720;canvas.width=width*scale;canvas.height=height*scale;
+ const ctx=canvas.getContext('2d');ctx.scale(scale,scale);ctx.clearRect(0,0,width,height);
+ const cx=width/2,cy=height/2,r=245,n=radarFields.length;
+ const angle=i=>-Math.PI/2+2*Math.PI*i/n;
+ for(let ring=1;ring<=4;ring++){ctx.beginPath();for(let i=0;i<n;i++){const a=angle(i),rr=r*ring/4;const x=cx+rr*Math.cos(a),y=cy+rr*Math.sin(a);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.closePath();ctx.strokeStyle='#d6dfeb';ctx.lineWidth=1;ctx.stroke();}
+ ctx.font='12px Arial';ctx.fillStyle='#34445b';
+ for(let i=0;i<n;i++){const a=angle(i),x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.strokeStyle='#e1e7f0';ctx.stroke();const lx=cx+(r+25)*Math.cos(a),ly=cy+(r+25)*Math.sin(a);ctx.textAlign=Math.cos(a)>.2?'left':Math.cos(a)<-.2?'right':'center';ctx.textBaseline='middle';ctx.fillText(radarFields[i].toUpperCase(),lx,ly);}
+ function draw(values,color,fill,dashed){ctx.beginPath();values.forEach((v,i)=>{const a=angle(i),rr=r*Math.max(0,Math.min(1,v??0));const x=cx+rr*Math.cos(a),y=cy+rr*Math.sin(a);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.closePath();ctx.strokeStyle=color;ctx.fillStyle=fill;ctx.lineWidth=2.8;ctx.setLineDash(dashed?[6,4]:[]);ctx.fill();ctx.stroke();ctx.setLineDash([]);}
+ draw(radarFields.map(f=>itemAverage(f).average),'#e58b2a','rgba(229,139,42,.12)',true);
+ draw(radarFields.map(f=>isEvaluated(student[f])?Number(student[f]):0),'#1769b3','rgba(23,105,179,.16)',false);
+}
+function addComparison(pane,row){
+ const section=document.createElement('section');section.className='suivi-group';addText(section,'h3','Comparaison avec la classe');
+ addText(section,'p','La toile d’araignée compare les 23 compétences notées sur 0 ou 1. Le contour bleu représente l’élève, le contour orange la moyenne des élèves évalués pour chaque item. Une case non évaluée est placée à zéro sur le graphique uniquement, sans entrer dans la moyenne de classe.','note');
+ const wrap=document.createElement('div');wrap.className='radar-wrap';const canvas=document.createElement('canvas');canvas.setAttribute('role','img');canvas.setAttribute('aria-label','Graphique radar comparant les résultats de l’élève et les moyennes de la classe pour les 23 items binaires');wrap.append(canvas);
+ const legend=document.createElement('div');legend.className='radar-legend';legend.innerHTML='<span style="--swatch:#1769b3">Élève</span><span style="--swatch:#e58b2a">Moyenne de classe</span>';wrap.append(legend);section.append(wrap);
+ const div=document.createElement('div');div.className='comparison';const table=document.createElement('table');const head=document.createElement('thead');const hr=document.createElement('tr');['Item et compétence','Élève','Moyenne classe','Évalués'].forEach(t=>addText(hr,'th',t));head.append(hr);table.append(head);const body=document.createElement('tbody');
+ for(const field of radarFields){const a=itemAverage(field);const tr=document.createElement('tr');[field.toUpperCase()+' — '+(descriptions[field]||''),isEvaluated(row[field])?(Number(row[field])===1?'Acquis (1)':'Non acquis (0)'):'Non évalué',a.average===null?'—':(a.average*100).toFixed(1).replace('.',',')+' %',String(a.count)+' / '+allStudents.length].forEach(t=>addText(tr,'td',t));body.append(tr);}table.append(body);div.append(table);section.append(div);
+ addText(section,'p','D1, E7B, F2, F1, Couleurs et Histoire sont des mesures sur d’autres échelles : elles ne figurent pas sur ce radar pour éviter une comparaison trompeuse. Leurs moyennes brutes figurent ci-dessous.','note');
+ const measureTable=document.createElement('div');measureTable.className='comparison';const mt=document.createElement('table');const mh=document.createElement('tr');['Mesure','Résultat élève','Moyenne classe','Évalués'].forEach(t=>addText(mh,'th',t));const mhead=document.createElement('thead');mhead.append(mh);mt.append(mhead);const mb=document.createElement('tbody');for(const field of ['d1','e7b','f1','f2','couleurs','histoire']){const avg=itemAverage(field),tr=document.createElement('tr');[field.toUpperCase()+' — '+(descriptions[field]||''),isEvaluated(row[field])?String(row[field]):'Non évalué',avg.average===null?'—':avg.average.toFixed(1).replace('.',','),avg.count+' / '+allStudents.length].forEach(t=>addText(tr,'td',t));mb.append(tr);}mt.append(mb);measureTable.append(mt);section.append(measureTable);
+ pane.prepend(section);renderRadar(canvas,row);
+}
+
+function addText(el,tag,text,cls){const child=document.createElement(tag);child.textContent=text;if(cls)child.className=cls;el.append(child);return child;}
+function showStudent(row){
+ currentStudentId=row.id;
+ const pane=document.getElementById('suivi-contenu');pane.replaceChildren();
+ document.getElementById('suivi-titre').textContent='Suivi individuel — '+row.eleve;
+ let acquired=0,failed=0,pending=0;
+ const sections={};
+ for(const [group,fields] of groups){if(group==='Total')continue;const section=document.createElement('section');section.className='suivi-group';addText(section,'h3',group==='Autres'?'Autres observations':'Domaine '+group);const grid=document.createElement('div');grid.className='suivi-grid';section.append(grid);sections[group]=grid;pane.append(section);}
+ for(const [group,fields] of groups){if(group==='Total')continue;for(const field of fields){if(computed.has(field))continue;
+ const val=row[field],empty=val===null||val===undefined||val==='';
+ let status,detail,cls;
+ if(empty){status='Non évalué';detail='Aucun résultat renseigné';cls='wait';pending++;}
+ else if(measures.has(field)){
+ if(Object.hasOwn(limits,field)){const good=Number(val)>=limits[field];status=good?'Seuil atteint':'Seuil non atteint';detail='Résultat : '+val+' — seuil de bonus : '+limits[field];cls=good?'ok':'no';}
+ else{status='Mesure renseignée';detail='Résultat : '+val+' — aucun seuil de réussite défini';cls='measure';}
+ }else if(Number(val)===1){status='Acquis';detail='Résultat : 1';cls='ok';acquired++;}
+ else if(Number(val)===0){status='Non acquis';detail='Résultat : 0';cls='no';failed++;}
+ else{status='À vérifier';detail='Valeur inattendue : '+val;cls='measure';}
+ const item=document.createElement('article');item.className='suivi-item '+cls;
+ addText(item,'strong',field.toUpperCase()+' — '+status);
+ addText(item,'p',descriptions[field]||'Description de compétence à compléter');
+ addText(item,'p',detail);
+ sections[group].append(item);
+ }}
+ const summary=document.createElement('p');summary.className='suivi-summary';summary.textContent=`${acquired} compétences acquises · ${failed} non acquises · ${pending} non évaluées · Total : ${row.sur_26??'—'}/26`;
+ pane.prepend(summary);addComparison(pane,row);document.getElementById('suivi').classList.add('open');
+}
+document.getElementById('fermer-suivi').addEventListener('click',()=>document.getElementById('suivi').classList.remove('open'));
+document.getElementById('suivi').addEventListener('click',e=>{if(e.target.id==='suivi')e.currentTarget.classList.remove('open')});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('suivi').classList.remove('open')});
 const message=document.getElementById('message');
 const tbody=document.getElementById('lignes');
 let loggedIn=false,dirty=new Set(),loading=false;
 function info(text,isError=false){message.textContent=text;message.className=isError?'error':'';}
-function renderHeader(){const tr=document.createElement('tr');const th=document.createElement('th');th.textContent='Élève';tr.append(th);for(const [group,fields] of groups){for(const field of fields){const cell=document.createElement('th');cell.textContent=labels[field]||field.toUpperCase();const small=document.createElement('span');small.className='group';small.textContent=group;cell.append(small);tr.append(cell);}}document.getElementById('entetes').replaceChildren(tr);}
+function renderHeader(){const tr=document.createElement('tr');const th=document.createElement('th');th.textContent='Élève';tr.append(th);for(const [group,fields] of groups){for(const field of fields){const cell=document.createElement('th');cell.textContent=labels[field]||field.toUpperCase();if(descriptions[field])cell.title=descriptions[field];const small=document.createElement('span');small.className='group';small.textContent=group;cell.append(small);tr.append(cell);}}document.getElementById('entetes').replaceChildren(tr);}
 function cellText(v){return v===null||v===undefined?'':String(v);}
-async function loadScores(){if(!loggedIn||loading||dirty.size)return;loading=true;const {data,error}=await db.from('eva_scores').select('*').order('id',{ascending:true});loading=false;if(error){info('Erreur de lecture : '+error.message,true);return;}const frag=document.createDocumentFragment();for(const row of data){const tr=document.createElement('tr');const name=document.createElement('td');const nameInput=document.createElement('input');nameInput.type='text';nameInput.className='nom-eleve';nameInput.maxLength=100;nameInput.value=row.eleve||'';nameInput.dataset.original=nameInput.value;nameInput.setAttribute('aria-label','Nom de l’élève');nameInput.addEventListener('change',()=>saveName(row.id,nameInput,name));name.append(nameInput);tr.append(name);for(const field of cols){const td=document.createElement('td');if(computed.has(field)){td.textContent=cellText(row[field]);td.className=field==='sur_26'?'total':'calculated';}else{const input=document.createElement('input');input.type='number';input.step='1';input.min='0';input.setAttribute('aria-label',`${row.eleve} — ${labels[field]||field.toUpperCase()}`);input.value=cellText(row[field]);input.dataset.original=input.value;input.addEventListener('change',()=>saveValue(row.id,field,input,td));td.append(input);}tr.append(td);}frag.append(tr);}tbody.replaceChildren(frag);document.getElementById('count').textContent=`${data.length} élèves`;}
+async function loadScores(){if(!loggedIn||loading||dirty.size)return;loading=true;const {data,error}=await db.from('eva_scores').select('*').order('id',{ascending:true});loading=false;if(error){info('Erreur de lecture : '+error.message,true);return;}allStudents=data;const frag=document.createDocumentFragment();for(const row of data){const tr=document.createElement('tr');const name=document.createElement('td');const nameInput=document.createElement('input');nameInput.type='text';nameInput.className='nom-eleve';nameInput.maxLength=100;nameInput.value=row.eleve||'';nameInput.dataset.original=nameInput.value;nameInput.setAttribute('aria-label','Nom de l’élève');nameInput.addEventListener('change',()=>saveName(row.id,nameInput,name));name.append(nameInput);const suiviButton=document.createElement('button');suiviButton.type='button';suiviButton.className='student-link';suiviButton.textContent='Voir le suivi';suiviButton.addEventListener('click',()=>showStudent(row));name.append(suiviButton);tr.append(name);for(const field of cols){const td=document.createElement('td');if(computed.has(field)){td.textContent=cellText(row[field]);td.className=field==='sur_26'?'total':'calculated';}else{const input=document.createElement('input');input.type='number';input.step='1';input.min='0';input.setAttribute('aria-label',`${row.eleve} — ${labels[field]||field.toUpperCase()}`);input.value=cellText(row[field]);input.dataset.original=input.value;input.addEventListener('change',()=>saveValue(row.id,field,input,td));td.append(input);}tr.append(td);}frag.append(tr);}tbody.replaceChildren(frag);document.getElementById('count').textContent=`${data.length} élèves`;}
 async function saveName(id,input,td){
  const nom=input.value.trim();
  if(!nom){info('Le nom de l’élève ne peut pas être vide.',true);input.value=input.dataset.original;return;}
