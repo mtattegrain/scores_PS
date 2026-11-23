@@ -36,6 +36,10 @@ const groups=[
 const cols=groups.flatMap(g=>g[1]);
 const computed=new Set(['bonus','bonus_e7b','bonus_f2','sur_26']);
 const labels={bonus:'Bonus D1',bonus_e7b:'Bonus E7B',bonus_f2:'Bonus F2',sur_26:'Sur 26',couleurs:'Dire le nom des couleurs',histoire:'Dire les mots-clés de l’histoire apprise en classe'};
+const competencyPdfLinks={
+ a1a:'https://eduscol.education.gouv.fr/sites/default/files/document/construire-le-nombre-pour-exprimer-les-quantites-1pdf-99096.pdf',
+ a1b:'https://eduscol.education.gouv.fr/sites/default/files/document/construire-le-nombre-pour-exprimer-les-quantites-1pdf-99096.pdf'
+};
 const descriptions={
  a1a:'Comparer deux collections (le moins)',a1b:'Comparer deux collections (le plus)',
  a2:'Réaliser une correspondance terme à terme',a3:'Produire une collection de même cardinal qu’une autre',
@@ -232,6 +236,13 @@ function exportStudentPdf(){
  styles:{font:'helvetica',fontSize:7.7,cellPadding:1.15,overflow:'linebreak',valign:'middle',minCellHeight:6},
  headStyles:{fillColor:[23,74,126]},alternateRowStyles:{fillColor:[244,248,252]},
  columnStyles:{0:{cellWidth:20},1:{cellWidth:112},2:{cellWidth:21},3:{cellWidth:34},4:{cellWidth:45}},
+ // La description de A1A et A1B est cliquable dans le PDF individuel.
+ didDrawCell:(data)=>{
+  if(data.section!=='body'||data.column.index!==1)return;
+  const field=cols.filter(f=>!computed.has(f))[data.row.index];
+  const url=competencyPdfLinks[field];
+  if(url)doc.link(data.cell.x,data.cell.y,data.cell.width,data.cell.height,{url});
+ },
  pageBreak:'avoid'});
  pdfFooter(doc);
  doc.save('bilan_'+cleanFilename(student.eleve)+'_A3_'+excelDate()+'.pdf');
