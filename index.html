@@ -4,6 +4,9 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Évaluations PS — Tableau partagé</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
 <style>
 :root{font-family:Arial,sans-serif;color:#17243b;background:#f5f7fb}*{box-sizing:border-box}body{margin:0}header{background:#163b70;color:white;padding:18px 24px}h1{margin:0;font-size:1.45rem}header p{margin:6px 0 0;color:#dce8f8}.wrap{padding:20px;max-width:1800px;margin:auto}.panel{background:white;border-radius:12px;padding:16px;box-shadow:0 2px 12px #102a4912;margin-bottom:16px}button,input{font:inherit}button{border:0;background:#175ca5;color:white;border-radius:7px;padding:9px 13px;cursor:pointer}button:hover{background:#124780}button:disabled{opacity:.55;cursor:wait}#login{display:flex;flex-wrap:wrap;gap:10px}#login input{padding:10px;border:1px solid #bac7d8;border-radius:7px;min-width:210px}#app{display:none}.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between}.toolbar>div{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.muted{color:#53647c}#message{min-height:1.5em;margin:10px 0}#message.error{color:#aa2323}.table-scroll{overflow:auto;max-height:72vh;border:1px solid #d8e0ec;border-radius:9px}table{border-collapse:separate;border-spacing:0;font-size:13px;min-width:1500px;width:max-content}th,td{border-right:1px solid #e1e6ee;border-bottom:1px solid #e1e6ee;text-align:center;padding:5px 6px;white-space:nowrap}thead th{position:sticky;top:0;background:#e9f0fa;z-index:2;padding:12px 7px}th:first-child,td:first-child{position:sticky;left:0;z-index:1;background:#fff;text-align:left;min-width:125px}thead th:first-child{z-index:3;background:#dce8f8}tbody tr:nth-child(even) td{background:#f8fafc}tbody tr:nth-child(even) td:first-child{background:#f8fafc}td input{width:55px;border:1px solid transparent;background:transparent;text-align:center;padding:7px 2px;border-radius:4px;color:inherit}td input.nom-eleve{width:155px;text-align:left;padding-left:8px}td input:focus{outline:2px solid #2672c9;background:white}td input:disabled{opacity:.6}td.calculated{background:#e8f5e9!important;font-weight:bold}td.total{background:#d5e9ff!important;font-weight:bold}td.saving{background:#fff1bd!important}td.failed{background:#ffe0e0!important}.group{font-size:11px;color:#65768b;display:block;font-weight:normal;margin-top:3px}.hint{font-size:13px;color:#526178;margin:12px 0 0}@media(max-width:600px){.wrap{padding:10px}.panel{padding:12px}}
 
@@ -16,9 +19,9 @@
 <main class="wrap">
 <section id="connexion" class="panel"><h2>Connexion</h2><form id="login"><input id="email" type="email" placeholder="Adresse e-mail" autocomplete="username" required><input id="password" type="password" placeholder="Mot de passe" autocomplete="current-password" required><button type="submit">Se connecter</button></form></section>
 <p id="message" role="status" aria-live="polite"></p>
-<section id="app"><div class="panel toolbar"><div><strong id="count">Élèves</strong><span class="muted">Les noms et les notes sont enregistrés automatiquement.</span></div><div><button id="refresh" type="button">Actualiser</button><button id="logout" type="button">Se déconnecter</button></div></div><div class="panel"><div class="table-scroll"><table><thead id="entetes"></thead><tbody id="lignes"></tbody></table></div><p class="hint">Clique sur un nom pour le modifier, ou sur « Voir le suivi » pour consulter les compétences réussies et non acquises. Déplace le tableau horizontalement pour voir toutes les compétences. Les cellules vertes correspondent aux bonus calculés ; la colonne bleue est le total sur 26. Vide une cellule pour enregistrer une valeur non renseignée.</p></div></section>
+<section id="app"><div class="panel toolbar"><div><strong id="count">Élèves</strong><span class="muted">Les noms et les notes sont enregistrés automatiquement.</span></div><div><button id="refresh" type="button">Actualiser</button><button id="export-classe" type="button">Exporter la classe (.xlsx)</button><button id="export-classe-pdf" type="button">Exporter la classe (.pdf)</button><button id="logout" type="button">Se déconnecter</button></div></div><div class="panel"><div class="table-scroll"><table><thead id="entetes"></thead><tbody id="lignes"></tbody></table></div><p class="hint">Clique sur un nom pour le modifier, ou sur « Voir le suivi » pour consulter les compétences réussies et non acquises. Déplace le tableau horizontalement pour voir toutes les compétences. Les cellules vertes correspondent aux bonus calculés ; la colonne bleue est le total sur 26. Vide une cellule pour enregistrer une valeur non renseignée.</p></div></section>
 </main>
-<div id="suivi" role="dialog" aria-modal="true" aria-labelledby="suivi-titre"><div class="suivi-card"><div class="suivi-head"><h2 id="suivi-titre">Suivi individuel</h2><button type="button" id="fermer-suivi">Fermer</button></div><p class="muted">Les résultats sont issus des notes enregistrées dans Supabase. Les mesures sans seuil défini ne sont pas classées en réussite ou échec.</p><div id="suivi-contenu"></div></div></div>
+<div id="suivi" role="dialog" aria-modal="true" aria-labelledby="suivi-titre"><div class="suivi-card"><div class="suivi-head"><h2 id="suivi-titre">Suivi individuel</h2><button type="button" id="export-eleve">Exporter ce bilan (.xlsx)</button><button type="button" id="export-eleve-pdf">Exporter ce bilan (.pdf)</button><button type="button" id="fermer-suivi">Fermer</button></div><p class="muted">Les résultats sont issus des notes enregistrées dans Supabase. Les mesures sans seuil défini ne sont pas classées en réussite ou échec.</p><div id="suivi-contenu"></div></div></div>
 <script>
 const SUPABASE_URL='https://ghmjtvtdpqwfyuxenmzv.supabase.co';
 const SUPABASE_KEY='sb_publishable_LGzmobJKP3W9nVyqerYbdA_aIBhqODq';
@@ -107,6 +110,123 @@ function showStudent(row){
  const summary=document.createElement('p');summary.className='suivi-summary';summary.textContent=`${acquired} compétences acquises · ${failed} non acquises · ${pending} non évaluées · Total : ${row.sur_26??'—'}/26`;
  pane.prepend(summary);addComparison(pane,row);document.getElementById('suivi').classList.add('open');
 }
+// Exports Excel, générés localement à partir des données Supabase déjà chargées.
+function excelAvailable(){if(!window.ExcelJS){info('La bibliothèque Excel n’a pas pu être chargée. Vérifie ta connexion Internet.',true);return false;}return true;}
+function cleanFilename(value){return String(value||'eleve').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9_-]+/g,'_').slice(0,65);}
+function excelDate(){return new Date().toISOString().slice(0,10);}
+function excelValue(v){return isEvaluated(v)?Number(v):null;}
+function styleSheet(ws,headerRow=1){
+ const r=ws.getRow(headerRow);r.font={bold:true,color:{argb:'FFFFFFFF'}};r.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF174A7E'}};r.alignment={vertical:'middle',wrapText:true};r.height=32;
+ ws.views=[{state:'frozen',xSplit:1,ySplit:headerRow}];
+ ws.eachRow((row,index)=>{if(index>headerRow&&index%2===0)row.eachCell({includeEmpty:false},cell=>{cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF1F5FA'}};});});
+}
+function downloadWorkbook(workbook,filename){return workbook.xlsx.writeBuffer().then(buffer=>{const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=filename;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);});}
+function groupFor(field){return groups.find(g=>g[1].includes(field))?.[0]||'';}
+function itemStatus(field,v){if(!isEvaluated(v))return 'Non évalué';if(measures.has(field)){if(Object.hasOwn(limits,field))return Number(v)>=limits[field]?'Seuil de bonus atteint':'Seuil de bonus non atteint';return 'Mesure renseignée';}return Number(v)===1?'Acquis':Number(v)===0?'Non acquis':'À vérifier';}
+function classAverageText(field){const a=itemAverage(field);return a.average===null?null:(measures.has(field)?Number(a.average.toFixed(2)):Number((a.average*100).toFixed(1)));}
+function createClassWorkbook(){
+ const wb=new ExcelJS.Workbook();wb.creator='Évaluations PS';wb.created=new Date();
+ const ws=wb.addWorksheet('Tableau classe');const keys=['eleve',...cols];ws.addRow(keys.map(k=>k==='eleve'?'Élève':labels[k]||k.toUpperCase()));
+ for(const row of allStudents)ws.addRow(keys.map(k=>k==='eleve'?row.eleve:excelValue(row[k])));
+ ws.columns=keys.map(k=>({width:k==='eleve'?24:Math.max(12,(labels[k]||k).length+3)}));styleSheet(ws);ws.autoFilter={from:{row:1,column:1},to:{row:1,column:keys.length}};
+ const stats=wb.addWorksheet('Moyennes par item');stats.addRow(['Domaine','Item','Compétence','Type','Moyenne de classe','Élèves évalués','Effectif total']);
+ for(const field of cols){if(computed.has(field))continue;const a=itemAverage(field);stats.addRow([groupFor(field),field.toUpperCase(),descriptions[field]||'',measures.has(field)?'Mesure brute':'Réussite (%)',classAverageText(field),a.count,allStudents.length]);}
+ stats.columns=[{width:16},{width:13},{width:78},{width:20},{width:22},{width:19},{width:17}];styleSheet(stats);stats.autoFilter='A1:G1';
+ stats.addRow([]);stats.addRow(['Note : les moyennes des items binaires sont en pourcentage et excluent les cases vides.']);
+ return wb;
+}
+function createStudentWorkbook(student){
+ const wb=new ExcelJS.Workbook();wb.creator='Évaluations PS';wb.created=new Date();
+ const ws=wb.addWorksheet('Bilan individuel');ws.mergeCells('A1:G1');ws.getCell('A1').value='Bilan individuel — '+student.eleve;ws.getCell('A1').font={bold:true,size:17,color:{argb:'FF174A7E'}};ws.getRow(1).height=30;
+ ws.getCell('A2').value='Total sur 26';ws.getCell('B2').value=excelValue(student.sur_26);
+ ws.getCell('D2').value='Date de l’export';ws.getCell('E2').value=excelDate();
+ ws.addRow([]);ws.addRow(['Domaine','Item','Description de la compétence','Résultat','Statut','Moyenne classe','Évalués']);
+ for(const field of cols){if(computed.has(field))continue;const a=itemAverage(field);ws.addRow([groupFor(field),field.toUpperCase(),descriptions[field]||'',excelValue(student[field]),itemStatus(field,student[field]),classAverageText(field),a.count+' / '+allStudents.length]);}
+ ws.columns=[{width:16},{width:13},{width:78},{width:15},{width:30},{width:20},{width:17}];styleSheet(ws,4);ws.autoFilter='A4:G4';
+ ws.addRow([]);ws.addRow(['Les moyennes des items notés 0/1 sont en pourcentage ; celles des mesures sont en unités brutes.']);
+ const chart=wb.addWorksheet('Graphique radar');chart.getCell('A1').value='Comparaison des 23 compétences binaires';chart.getCell('A1').font={size:16,bold:true};
+ chart.getCell('A2').value='Bleu : élève — Orange : moyenne de classe. Les items non évalués sont tracés à zéro uniquement pour la visualisation.';
+ const canvas=document.createElement('canvas');renderRadar(canvas,student);
+ const imageId=wb.addImage({base64:canvas.toDataURL('image/png'),extension:'png'});chart.addImage(imageId,{tl:{col:0,row:3},ext:{width:720,height:720}});chart.getColumn(1).width=28;
+ return wb;
+}
+async function performExport(button,make,filename){
+ if(!excelAvailable())return;
+ if(!loggedIn||!allStudents.length){info('Aucune donnée à exporter.',true);return;}
+ button.disabled=true;const label=button.textContent;button.textContent='Préparation du fichier…';
+ try{const workbook=make();await downloadWorkbook(workbook,filename);info('Fichier Excel généré : '+filename);}
+ catch(e){info('Export Excel impossible : '+e.message,true);}
+ finally{button.disabled=false;button.textContent=label;}
+}
+document.getElementById('export-classe').addEventListener('click',e=>performExport(e.currentTarget,createClassWorkbook,'evaluations_PS_classe_'+excelDate()+'.xlsx'));
+document.getElementById('export-eleve').addEventListener('click',e=>{
+ const student=allStudents.find(s=>s.id===currentStudentId);
+ if(!student){info('Élève introuvable, actualise le tableau.',true);return;}
+ performExport(e.currentTarget,()=>createStudentWorkbook(student),'bilan_'+cleanFilename(student.eleve)+'_'+excelDate()+'.xlsx');
+});
+// Exports PDF : toutes les données sont traitées localement dans le navigateur.
+function pdfAvailable(){if(!window.jspdf?.jsPDF){info('La bibliothèque PDF n’a pas pu être chargée. Vérifie ta connexion Internet.',true);return false;}return true;}
+function pdfHeader(doc,title,subtitle){
+ const w=doc.internal.pageSize.getWidth();doc.setFillColor(23,74,126);doc.rect(0,0,w,22,'F');doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(15);doc.text(title,14,13);doc.setTextColor(55,70,90);doc.setFont('helvetica','normal');doc.setFontSize(9);doc.text(subtitle,14,29);
+}
+function pdfFooter(doc){const count=doc.internal.getNumberOfPages();for(let i=1;i<=count;i++){doc.setPage(i);const h=doc.internal.pageSize.getHeight(),w=doc.internal.pageSize.getWidth();doc.setFontSize(8);doc.setTextColor(100,110,125);doc.text('Évaluations PS — export du '+new Date().toLocaleDateString('fr-FR'),14,h-9);doc.text('Page '+i+' / '+count,w-14,h-9,{align:'right'});}}
+function pdfText(value){return String(value??'—');}
+function pdfTable(doc,head,body,options={}){doc.autoTable({head:[head],body,theme:'grid',startY:options.startY??36,margin:{left:12,right:12,top:35,bottom:18},styles:{font:'helvetica',fontSize:options.fontSize??8,cellPadding:2.2,overflow:'linebreak'},headStyles:{fillColor:[23,74,126]},alternateRowStyles:{fillColor:[244,248,252]},...options});}
+function exportClassPdf(){
+ if(!pdfAvailable()||!loggedIn||!allStudents.length){if(!allStudents.length)info('Aucune donnée à exporter.',true);return;}
+ try{
+ const {jsPDF}=window.jspdf;
+ // A3 paysage : toutes les colonnes et tous les élèves sur une page.
+ const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a3'});
+ pdfHeader(doc,'Évaluations PS — tableau complet de la classe','Tous les élèves et tous les items sur une seule page A3 paysage');
+ const head=['Élève',...cols.map(f=>labels[f]||f.toUpperCase())];
+ const body=allStudents.map(row=>[row.eleve,...cols.map(f=>isEvaluated(row[f])?String(row[f]):'')]);
+ const width=doc.internal.pageSize.getWidth()-20;
+ const nameWidth=33,scoreWidth=(width-nameWidth)/cols.length;
+ const styles={0:{cellWidth:nameWidth}};
+ cols.forEach((_,i)=>{styles[i+1]={cellWidth:scoreWidth};});
+ doc.autoTable({head:[head],body,startY:36,margin:{left:10,right:10,top:36,bottom:15},theme:'grid',tableWidth:width,
+ styles:{font:'helvetica',fontSize:5.4,cellPadding:0.7,halign:'center',valign:'middle',overflow:'ellipsize',minCellHeight:6},
+ headStyles:{fillColor:[23,74,126],fontSize:5.2},columnStyles:styles,
+ alternateRowStyles:{fillColor:[244,248,252]},
+ didParseCell(data){if(data.column.index===0)data.cell.styles.halign='left';},
+ pageBreak:'avoid'});
+ // Les moyennes sont présentées dans le PDF individuel et dans l'export Excel de classe.
+ pdfFooter(doc);doc.save('evaluations_PS_classe_A3_'+excelDate()+'.pdf');info('PDF A3 de la classe téléchargé (une page).');
+ }catch(e){info('Export PDF impossible : '+e.message,true);}
+}
+function exportStudentPdf(){
+ if(!pdfAvailable()||!loggedIn)return;
+ const student=allStudents.find(s=>s.id===currentStudentId);if(!student){info('Élève introuvable.',true);return;}
+ try{
+ const {jsPDF}=window.jspdf;
+ // Bilan et radar côte à côte sur une page A3 paysage.
+ const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a3'});
+ pdfHeader(doc,'Bilan individuel — '+student.eleve,'Total : '+pdfText(student.sur_26)+'/26 · Comparaison avec la classe');
+ const canvas=document.createElement('canvas');renderRadar(canvas,student);
+ const img=canvas.toDataURL('image/png');doc.addImage(img,'PNG',10,43,155,155);
+ doc.setFontSize(8);doc.setTextColor(30,70,110);doc.text('Bleu : élève',16,207);
+ doc.setTextColor(180,105,30);doc.text('Orange : moyenne de classe',57,207);
+ doc.setTextColor(75,85,100);doc.setFontSize(7);
+ doc.text(doc.splitTextToSize('Radar : items notés 0/1. Les cases non évaluées sont tracées à zéro, mais exclues des moyennes de classe.',151),12,217);
+ const rows=cols.filter(f=>!computed.has(f)).map(f=>{
+ const a=itemAverage(f);const mean=a.average===null?'—':measures.has(f)?a.average.toFixed(2).replace('.',','):(a.average*100).toFixed(1).replace('.',',')+' %';
+ return [f.toUpperCase(),descriptions[f]||'—',isEvaluated(student[f])?String(student[f]):'—',itemStatus(f,student[f]),mean,a.count+' / '+allStudents.length];
+ });
+ doc.autoTable({head:[['Item','Compétence','Score','État','Classe','Évalués']],body:rows,startY:36,
+ margin:{left:173,right:9,top:36,bottom:14},tableWidth:235,theme:'grid',
+ styles:{font:'helvetica',fontSize:6.8,cellPadding:1.1,overflow:'linebreak',valign:'middle',minCellHeight:6},
+ headStyles:{fillColor:[23,74,126]},alternateRowStyles:{fillColor:[244,248,252]},
+ columnStyles:{0:{cellWidth:14},1:{cellWidth:112},2:{cellWidth:15},3:{cellWidth:35},4:{cellWidth:27},5:{cellWidth:32}},
+ pageBreak:'avoid'});
+ pdfFooter(doc);
+ doc.save('bilan_'+cleanFilename(student.eleve)+'_A3_'+excelDate()+'.pdf');
+ info('Bilan individuel A3 téléchargé (une page).');
+ }catch(e){info('Export PDF impossible : '+e.message,true);}
+}
+document.getElementById('export-classe-pdf').addEventListener('click',exportClassPdf);
+document.getElementById('export-eleve-pdf').addEventListener('click',exportStudentPdf);
+
 document.getElementById('fermer-suivi').addEventListener('click',()=>document.getElementById('suivi').classList.remove('open'));
 document.getElementById('suivi').addEventListener('click',e=>{if(e.target.id==='suivi')e.currentTarget.classList.remove('open')});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('suivi').classList.remove('open')});
@@ -139,3 +259,4 @@ setInterval(()=>{if(loggedIn&&document.visibilityState==='visible')loadScores();
 renderHeader();updateSession();
 </script>
 </body></html>
+
