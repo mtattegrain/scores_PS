@@ -87,7 +87,7 @@ function renderRadar(canvas,student){
  draw(radarFields.map(f=>isEvaluated(student[f])?normalized(f,student[f]):0),'#1769b3','rgba(23,105,179,.16)',false);
 }
 function addComparison(pane,row){
- const section=document.createElement('section');section.className='suivi-group';addText(section,'h3','Comparaison avec la classe');
+ const section=document.createElement('section');section.className='suivi-group';addText(section,'h3','Profil des compétences');
  addText(section,'p','La toile d’araignée combine compétences binaires et mesures sur une échelle de 0 à 100 %. Références graphiques (100 %) : E7A = 2, E7B = 30, F1 = 26, F2 = 40, D1 = 20. Les valeurs dépassant leur référence sont plafonnées à 100 % sur le radar, mais leurs scores bruts sont conservés. Le bleu représente l’élève sélectionné et l’orange la moyenne de classe. Les cases vides sont exclues des moyennes ; elles ne constituent pas un échec.','note');
  const wrap=document.createElement('div');wrap.className='radar-wrap';const canvas=document.createElement('canvas');canvas.setAttribute('role','img');canvas.setAttribute('aria-label','Graphique radar comparant les compétences binaires et les mesures normalisées de l’élève et de la classe');wrap.append(canvas);
  const legend=document.createElement('div');legend.className='radar-legend';legend.innerHTML='<span style="--swatch:#1769b3"></span><span style="--swatch:#e58b2a">Moyenne de classe</span>';legend.firstElementChild.textContent=row.eleve||'Élève';wrap.append(legend);section.append(wrap);
@@ -123,7 +123,7 @@ function showStudent(row){
  addText(item,'p',detail);
  sections[group].append(item);
  }}
- const summary=document.createElement('p');summary.className='suivi-summary';summary.textContent=`${acquired} compétences acquises · ${failed} non acquises · ${pending} non évaluées · Total : ${row.sur_26??'—'}/26`;
+ const summary=document.createElement('p');summary.className='suivi-summary';summary.textContent=`${acquired} compétences acquises · ${failed} non acquises · ${pending} non évaluées`;
  pane.prepend(summary);addComparison(pane,row);document.getElementById('suivi').classList.add('open');
 }
 // Exports Excel, générés localement à partir des données Supabase déjà chargées.
@@ -154,7 +154,7 @@ function createClassWorkbook(){
 function createStudentWorkbook(student){
  const wb=new ExcelJS.Workbook();wb.creator='Évaluations PS';wb.created=new Date();
  const ws=wb.addWorksheet('Bilan individuel');ws.mergeCells('A1:F1');ws.getCell('A1').value='Bilan individuel — '+student.eleve;ws.getCell('A1').font={bold:true,size:17,color:{argb:'FF174A7E'}};ws.getRow(1).height=30;
- ws.getCell('A2').value='Total sur 26';ws.getCell('B2').value=excelValue(student.sur_26);
+ // Le total sur 26 est réservé au tableau de classe.
  ws.getCell('D2').value='Date de l’export';ws.getCell('E2').value=excelDate();
  ws.addRow([]);ws.addRow(['Domaine','Item','Description de la compétence','Score','Statut','Moyenne classe']);
  for(const field of cols){if(computed.has(field))continue;const a=itemAverage(field);ws.addRow([groupFor(field),field.toUpperCase(),descriptions[field]||'',scoreLabel(field,student[field]),itemStatus(field,student[field]),classAverageText(field)]);}
@@ -218,7 +218,7 @@ function exportStudentPdf(){
  const {jsPDF}=window.jspdf;
  // Bilan et radar côte à côte sur une page A3 paysage.
  const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a3'});
- pdfHeader(doc,'Bilan individuel — '+student.eleve,'Total : '+pdfText(student.sur_26)+'/26 · Comparaison avec la classe');
+ pdfHeader(doc,'Bilan individuel — '+student.eleve,'');
  const canvas=document.createElement('canvas');renderRadar(canvas,student);
  const img=canvas.toDataURL('image/png');doc.addImage(img,'PNG',7,41,168,168);
  doc.setFontSize(8);doc.setTextColor(30,70,110);doc.text('Bleu : '+pdfText(student.eleve),16,215);
