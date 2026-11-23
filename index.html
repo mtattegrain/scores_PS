@@ -56,8 +56,8 @@ const descriptions={
 // Références de représentation : valeur correspondant à 100 % sur le radar.
 // Les valeurs au-dessus de la référence restent visibles dans le tableau détaillé,
 // mais sont plafonnées à 100 % sur le radar.
-const radarReferences={e7a:2,e7b:30,f1:26,f2:40,d1:50,couleurs:11};
-function scoreLabel(field,v){if(!isEvaluated(v))return 'Non évalué';return Object.hasOwn(radarReferences,field)?String(v)+'/'+radarReferences[field]:String(v);}
+const radarReferences={e7a:2,e7b:30,f1:26,f2:40,d1:20,couleurs:11};
+function scoreLabel(field,v){if(!isEvaluated(v))return 'Non évalué';if(field==='e7a')return Number(v)===0?'0':Number(v)===1?'simple':Number(v)===2?'double':String(v);if(field==='d1')return String(v);if(!measures.has(field))return '';return Object.hasOwn(radarReferences,field)?String(v)+'/'+radarReferences[field]:String(v);}
 function normalized(field,value){
  if(!isEvaluated(value))return null;
  return Math.max(0,Math.min(1,Number(value)/(radarReferences[field]||1)));
@@ -88,7 +88,7 @@ function renderRadar(canvas,student){
 }
 function addComparison(pane,row){
  const section=document.createElement('section');section.className='suivi-group';addText(section,'h3','Comparaison avec la classe');
- addText(section,'p','La toile d’araignée combine compétences binaires et mesures sur une échelle de 0 à 100 %. Références graphiques (100 %) : E7A = 2, E7B = 30, F1 = 26, F2 = 40, D1 = 50. Les valeurs dépassant leur référence sont plafonnées à 100 % sur le radar, mais leurs scores bruts sont conservés. Le bleu représente l’élève et l’orange la moyenne de classe. Les cases vides sont exclues des moyennes ; elles ne constituent pas un échec.','note');
+ addText(section,'p','La toile d’araignée combine compétences binaires et mesures sur une échelle de 0 à 100 %. Références graphiques (100 %) : E7A = 2, E7B = 30, F1 = 26, F2 = 40, D1 = 20. Les valeurs dépassant leur référence sont plafonnées à 100 % sur le radar, mais leurs scores bruts sont conservés. Le bleu représente l’élève et l’orange la moyenne de classe. Les cases vides sont exclues des moyennes ; elles ne constituent pas un échec.','note');
  const wrap=document.createElement('div');wrap.className='radar-wrap';const canvas=document.createElement('canvas');canvas.setAttribute('role','img');canvas.setAttribute('aria-label','Graphique radar comparant les compétences binaires et les mesures normalisées de l’élève et de la classe');wrap.append(canvas);
  const legend=document.createElement('div');legend.className='radar-legend';legend.innerHTML='<span style="--swatch:#1769b3">Élève</span><span style="--swatch:#e58b2a">Moyenne de classe</span>';wrap.append(legend);section.append(wrap);
  const div=document.createElement('div');div.className='comparison';const table=document.createElement('table');const head=document.createElement('thead');const hr=document.createElement('tr');['Item et compétence','Score','Référence','Moyenne classe'].forEach(t=>addText(hr,'th',t));head.append(hr);table.append(head);const body=document.createElement('tbody');
@@ -110,12 +110,12 @@ function showStudent(row){
  const val=row[field],empty=val===null||val===undefined||val==='';
  let status,detail,cls;
  if(empty){status='Non évalué';detail='Aucun résultat renseigné';cls='wait';pending++;}
- else if(field==='e7a'){status='Mesure renseignée';detail='Niveau : '+val+' / 2 — '+displayStatus(field,val);cls='measure';}
+ else if(field==='e7a'){status='Mesure renseignée';detail='Résultat : '+scoreLabel(field,val)+' — '+displayStatus(field,val);cls='measure';}
  else if(measures.has(field)){
  if(Object.hasOwn(limits,field)){const good=Number(val)>=limits[field];status=good?'Acquis':'Non acquis';detail='Résultat : '+scoreLabel(field,val)+' — critère de réussite : '+limits[field];cls=good?'ok':'no';}
  else{status='Mesure renseignée';detail='Résultat : '+val+' — aucun seuil de réussite défini';cls='measure';}
- }else if(Number(val)===1){status='Acquis';detail='Résultat : 1';cls='ok';acquired++;}
- else if(Number(val)===0){status='Non acquis';detail='Résultat : 0';cls='no';failed++;}
+ }else if(Number(val)===1){status='Acquis';detail='Compétence validée';cls='ok';acquired++;}
+ else if(Number(val)===0){status='Non acquis';detail='Compétence non validée';cls='no';failed++;}
  else{status='À vérifier';detail='Valeur inattendue : '+val;cls='measure';}
  const item=document.createElement('article');item.className='suivi-item '+cls;
  addText(item,'strong',field.toUpperCase()+' — '+status);
@@ -159,7 +159,7 @@ function createStudentWorkbook(student){
  ws.addRow([]);ws.addRow(['Domaine','Item','Description de la compétence','Score','Statut','Moyenne classe']);
  for(const field of cols){if(computed.has(field))continue;const a=itemAverage(field);ws.addRow([groupFor(field),field.toUpperCase(),descriptions[field]||'',scoreLabel(field,student[field]),itemStatus(field,student[field]),classAverageText(field)]);}
  ws.columns=[{width:16},{width:13},{width:78},{width:15},{width:30},{width:20}];styleSheet(ws,4);ws.autoFilter='A4:F4';
- ws.addRow([]);ws.addRow(['Les moyennes des compétences binaires sont en pourcentage ; les mesures restent en unités brutes. Radar : références 100 % D1=50, E7A=2, E7B=30, F1=26, F2=40.']);
+ ws.addRow([]);ws.addRow(['Les moyennes des compétences binaires sont en pourcentage ; les mesures restent en unités brutes. Radar : références 100 % D1=20, E7A=2, E7B=30, F1=26, F2=40.']);
  const chart=wb.addWorksheet('Graphique radar');chart.getCell('A1').value='Comparaison des compétences et mesures (normalisées)' ;chart.getCell('A1').font={size:16,bold:true};
  chart.getCell('A2').value='Bleu : élève — Orange : moyenne de classe. Mesures ramenées à 100 % par références graphiques. Les items non évalués sont exclus des moyennes.';
  const canvas=document.createElement('canvas');renderRadar(canvas,student);
@@ -224,16 +224,16 @@ function exportStudentPdf(){
  doc.setFontSize(8);doc.setTextColor(30,70,110);doc.text('Bleu : élève',16,215);
  doc.setTextColor(180,105,30);doc.text('Orange : moyenne de classe',57,215);
  doc.setTextColor(75,85,100);doc.setFontSize(7);
- doc.text(doc.splitTextToSize('Radar : compétences binaires et mesures normalisées (D1/50, E7A/2, E7B/30, F1/26, F2/40). Les valeurs absentes sont exclues des moyennes.',160),10,225);
+ doc.text(doc.splitTextToSize('Radar : compétences binaires et mesures normalisées (D1/20, E7A/2, E7B/30, F1/26, F2/40). Les valeurs absentes sont exclues des moyennes.',160),10,225);
  const rows=cols.filter(f=>!computed.has(f)).map(f=>{
  const a=itemAverage(f);const mean=a.average===null?'—':measures.has(f)?a.average.toFixed(2).replace('.',','):(radarMean(f)*100).toFixed(1).replace('.',',')+' %';
  return [f.toUpperCase(),descriptions[f]||'—',scoreLabel(f,student[f]),itemStatus(f,student[f]),mean];
  });
  doc.autoTable({head:[['Item','Compétence','Score','État','Classe']],body:rows,startY:36,
  margin:{left:180,right:8,top:36,bottom:14},tableWidth:232,theme:'grid',
- styles:{font:'helvetica',fontSize:7.5,cellPadding:1.15,overflow:'linebreak',valign:'middle',minCellHeight:6},
+ styles:{font:'helvetica',fontSize:7.7,cellPadding:1.15,overflow:'linebreak',valign:'middle',minCellHeight:6},
  headStyles:{fillColor:[23,74,126]},alternateRowStyles:{fillColor:[244,248,252]},
- columnStyles:{0:{cellWidth:13},1:{cellWidth:126},2:{cellWidth:23},3:{cellWidth:37},4:{cellWidth:33}},
+ columnStyles:{0:{cellWidth:20},1:{cellWidth:119},2:{cellWidth:23},3:{cellWidth:37},4:{cellWidth:33}},
  pageBreak:'avoid'});
  pdfFooter(doc);
  doc.save('bilan_'+cleanFilename(student.eleve)+'_A3_'+excelDate()+'.pdf');
