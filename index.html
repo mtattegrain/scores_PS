@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tableau de scores partagé</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 0 16px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+    }
+    input { max-width: 100%; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      border-bottom: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+    #app { display: none; }
+    #message { margin: 12px 0; }
+  </style>
+</head>
+<body>
+  <h1>Tableau de scores partagé</h1>
+
+  <section id="connexion">
+    <h2>Connexion</h2>
+    <form id="login">
+      <input id="email" type="email"
+        placeholder="Adresse e-mail" required>
+      <input id="password" type="password"
+        placeholder="Mot de passe" required>
+      <button type="submit">Se connecter</button>
+    </form>
+  </section>
+
+  <p id="message" role="status"></p>
+
+  <section id="app">
+    <button id="logout">Se déconnecter</button>
+    <h2>Ajouter un score</h2>
+    <form id="ajout">
+      <input id="eleve" placeholder="Identifiant de l'élève"
+        required maxlength="100">
+      <input id="score" type="number" step="any"
+        placeholder="Score" required>
+      <button type="submit">Enregistrer</button>
+    </form>
+
+    <h2>Scores enregistrés</h2>
+    <table>
+      <thead>
+        <tr><th>Élève</th><th>Score</th></tr>
+      </thead>
+      <tbody id="lignes"></tbody>
+    </table>
+  </section>
+
+  <script>
+    const SUPABASE_URL = "https://ghmjtvtdpqwfyuxenmzv.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_LGzmobJKP3W9nVyqerYbdA_aIBhqODq";
+
+    const db = window.supabase.createClient(
+      SUPABASE_URL, SUPABASE_KEY
+    );
+
+    const message = document.getElementById("message");
+    const connexion = document.getElementById("connexion");
+    const app = document.getElementById("app");
+    const lignes = document.getElementById("lignes");
+
+    function informer(texte) {
+      message.textContent = texte;
+    }
+
+    async function afficherScores() {
+      const { data, error } = await db
+        .from("scores")
+        .select("id, eleve, score")
+        .order("id");
+
+      if (error) {
+        informer("Erreur de lecture : " + error.message);
+        return;
+      }
+
+      lignes.replaceChildren();
+
+      for (const item of data) {
+        const tr = document.createElement("tr");
+        const nom = document.createElement("td");
+        const score = document.createElement("td");
+
+        nom.textContent = item.eleve;
+        score.textContent = item.score;
+
+        tr.append(nom, score);
+        lignes.appendChild(tr);
+      }
+    }
+
+    async function actualiserSession() {
+      const { data } = await db.auth.getSession();
+      const connecte = !!data.session;
+
+      connexion.style.display = connecte ? "none" : "block";
+      app.style.display = connecte ? "block" : "none";
+
+      if (connecte) await afficherScores();
+    }
+
+    document.getElementById("login").onsubmit =
+      async (event) => {
+        event.preventDefault();
+
+        const { error } = await db.auth.signInWithPassword({
+          email: document.getElementById("email").value,
+          password: document.getElementById("password").value
+        });
+
+        if (error) {
+          informer("Connexion impossible. Vérifie tes identifiants.");
+        } else {
+          informer("Connexion réussie.");
+          await actualiserSession();
+        }
+      };
+
+    document.getElementById("logout").onclick =
+      async () => {
+        await db.auth.signOut();
+        informer("Tu es déconnecté.");
+        await actualiserSession();
+      };
+
+    document.getElementById("ajout").onsubmit =
+      async (event) => {
+        event.preventDefault();
+
+        const eleve = document.getElementById("eleve")
+          .value.trim();
+        const score = Number(
+          document.getElementById("score").value
+        );
+
+        if (!eleve || !Number.isFinite(score)) {
+          informer("Vérifie les valeurs saisies.");
+          return;
+        }
+
+        const { error } = await db.from("scores").insert({
+          eleve,
+          score
+        });
+
+        if (error) {
+          informer("Enregistrement impossible.");
+          return;
+        }
+
+        event.target.reset();
+        informer("Score enregistré.");
+        await afficherScores();
+      };
+
+    db.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+        actualiserSession();
+      }
+    });
+
+    db.channel("scores-en-direct")
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "scores"
+      }, () => afficherScores())
+      .subscribe();
+
+    actualiserSession();
+  </script>
+</body>
+</html>
