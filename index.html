@@ -37,8 +37,35 @@ const cols=groups.flatMap(g=>g[1]);
 const computed=new Set(['bonus','bonus_e7b','bonus_f2','sur_26']);
 const labels={bonus:'Bonus D1',bonus_e7b:'Bonus E7B',bonus_f2:'Bonus F2',sur_26:'Sur 26',couleurs:'Dire le nom des couleurs',histoire:'Dire les mots-clés de l’histoire apprise en classe'};
 const competencyPdfLinks={
- a1a:'https://eduscol.education.gouv.fr/sites/default/files/document/construire-le-nombre-pour-exprimer-les-quantites-1pdf-99096.pdf',
- a1b:'https://eduscol.education.gouv.fr/sites/default/files/document/construire-le-nombre-pour-exprimer-les-quantites-1pdf-99096.pdf'
+ 'a1a':'https://eduscol.education.gouv.fr/sites/default/files/document/construire-le-nombre-pour-exprimer-les-quantites-1pdf-99096.pdf',
+ 'a1b':'https://eduscol.education.gouv.fr/sites/default/files/document/construire-le-nombre-pour-exprimer-les-quantites-1pdf-99096.pdf',
+ 'a2':'https://eduscol.education.gouv.fr/sites/default/files/document/construire-le-nombre-pour-exprimer-les-quantites-1pdf-99096.pdf',
+ 'a3':'https://eduscol.education.gouv.fr/sites/default/files/document/construire-le-nombre-pour-exprimer-les-quantites-1pdf-99096.pdf',
+ 'b1':'https://eduscol.education.gouv.fr/sites/default/files/document/construire-le-nombre-pour-exprimer-les-quantites-1pdf-99096.pdf',
+ 'b2':'https://eduscol.education.gouv.fr/sites/default/files/document/guide-pour-enseigner-la-construction-du-nombre-l-ecole-maternelle-100773.pdf',
+ 'b3':'https://eduscol.education.gouv.fr/sites/default/files/document/guide-pour-enseigner-la-construction-du-nombre-l-ecole-maternelle-100773.pdf',
+ 'b4a':'https://eduscol.education.gouv.fr/sites/default/files/document/guide-pour-enseigner-la-construction-du-nombre-l-ecole-maternelle-100773.pdf',
+ 'b4b':'https://eduscol.education.gouv.fr/sites/default/files/document/guide-pour-enseigner-la-construction-du-nombre-l-ecole-maternelle-100773.pdf',
+ 'd1':'https://eduscol.education.gouv.fr/sites/default/files/document/guide-pour-enseigner-la-construction-du-nombre-l-ecole-maternelle-100773.pdf',
+ 'd2a':'https://eduscol.education.gouv.fr/sites/default/files/document/guide-pour-enseigner-la-construction-du-nombre-l-ecole-maternelle-100773.pdf',
+ 'd2b':'https://eduscol.education.gouv.fr/sites/default/files/document/guide-pour-enseigner-la-construction-du-nombre-l-ecole-maternelle-100773.pdf',
+ 'd2c':'https://eduscol.education.gouv.fr/sites/default/files/document/guide-pour-enseigner-la-construction-du-nombre-l-ecole-maternelle-100773.pdf',
+ 'c1':'https://eduscol.education.gouv.fr/media/5641/download',
+ 'c2':'https://eduscol.education.gouv.fr/media/5641/download',
+ 'e1':'https://eduscol.education.gouv.fr/media/5641/download',
+ 'e2':'https://eduscol.education.gouv.fr/media/5641/download',
+ 'e3':'https://eduscol.education.gouv.fr/media/5641/download',
+ 'e4':'https://eduscol.education.gouv.fr/media/5641/download',
+ 'e5':'https://eduscol.education.gouv.fr/media/5641/download',
+ 'e6':'https://eduscol.education.gouv.fr/media/5641/download',
+ 'e7a':'https://eduscol.education.gouv.fr/4689/jouer-et-apprendre-au-cycle-1',
+ 'e7b':'https://eduscol.education.gouv.fr/4689/jouer-et-apprendre-au-cycle-1',
+ 'f1':'https://eduscol.education.gouv.fr/4698/le-developpement-et-la-structuration-du-langage-oral-et-ecrit-au-cycle-1',
+ 'f3a':'https://eduscol.education.gouv.fr/4698/le-developpement-et-la-structuration-du-langage-oral-et-ecrit-au-cycle-1',
+ 'f3b':'https://eduscol.education.gouv.fr/4698/le-developpement-et-la-structuration-du-langage-oral-et-ecrit-au-cycle-1',
+ 'f2':'https://eduscol.education.gouv.fr/sites/default/files/document/guide-pour-enseigner-le-vocabulaire-l-ecole-maternelle-67695.pdf',
+ 'couleurs':'https://eduscol.education.gouv.fr/sites/default/files/document/guide-pour-enseigner-le-vocabulaire-l-ecole-maternelle-67695.pdf',
+ 'histoire':'https://eduscol.education.gouv.fr/sites/default/files/document/ressc1langagelitteratureapprendreacomprendrerecits774761pdf-74088.pdf'
 };
 const descriptions={
  a1a:'Comparer deux collections (le moins)',a1b:'Comparer deux collections (le plus)',
@@ -225,8 +252,6 @@ function exportStudentPdf(){
  const img=canvas.toDataURL('image/png');doc.addImage(img,'PNG',7,41,168,168);
  doc.setFontSize(8);doc.setTextColor(30,70,110);doc.text('Bleu : '+pdfText(student.eleve),16,215);
  doc.setTextColor(180,105,30);doc.text('Orange : moyenne de classe',85,215);
- doc.setTextColor(75,85,100);doc.setFontSize(7);
- doc.text(doc.splitTextToSize('Radar : compétences binaires et mesures normalisées (D1/20, E7A/2, E7B/30, F1/26, F2/40). Les valeurs absentes sont exclues des moyennes.',160),10,225);
  const rows=cols.filter(f=>!computed.has(f)).map(f=>{
  const a=itemAverage(f);const mean=a.average===null?'—':measures.has(f)?a.average.toFixed(2).replace('.',','):(radarMean(f)*100).toFixed(1).replace('.',',')+' %';
  return [f.toUpperCase(),descriptions[f]||'—',scoreLabel(f,student[f]),itemStatus(f,student[f]),mean];
@@ -236,7 +261,7 @@ function exportStudentPdf(){
  styles:{font:'helvetica',fontSize:7.7,cellPadding:1.15,overflow:'linebreak',valign:'middle',minCellHeight:6},
  headStyles:{fillColor:[23,74,126]},alternateRowStyles:{fillColor:[244,248,252]},
  columnStyles:{0:{cellWidth:20},1:{cellWidth:112},2:{cellWidth:21},3:{cellWidth:34},4:{cellWidth:45}},
- // La description de A1A et A1B est cliquable dans le PDF individuel.
+ // Les descriptions de toutes les compétences sont cliquables dans le PDF individuel.
  didDrawCell:(data)=>{
   if(data.section!=='body'||data.column.index!==1)return;
   const field=cols.filter(f=>!computed.has(f))[data.row.index];
