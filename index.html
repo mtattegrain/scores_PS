@@ -20,7 +20,7 @@
 <section id="connexion" class="panel"><h2>Connexion</h2><form id="login"><input id="email" type="text" autocapitalize="none" spellcheck="false" placeholder="Pseudo ou adresse e-mail" autocomplete="username" required><input id="password" type="password" placeholder="Mot de passe" autocomplete="current-password" required><button type="submit">Se connecter</button></form></section>
 <p id="message" role="status" aria-live="polite"></p>
 <section id="app"><div class="panel toolbar"><div><strong id="count">Élèves</strong><span class="muted">Les notes sont enregistrées automatiquement.</span><span id="accountInfo" class="muted"></span></div><div><button id="refresh" type="button">Actualiser</button><button id="export-classe" type="button">Exporter la classe (.xlsx)</button><button id="export-classe-pdf" type="button">Exporter la classe (.pdf)</button><button id="openAdmin" type="button" hidden>Administration</button><button id="logout" type="button">Se déconnecter</button></div></div><div class="panel"><div class="table-scroll"><table><thead id="entetes"></thead><tbody id="lignes"></tbody></table></div><p class="hint"><span id="nameHint">Clique sur « Voir le suivi »</span> pour consulter les compétences réussies et non acquises. Déplace le tableau horizontalement pour voir toutes les compétences. Les cellules vertes correspondent aux bonus calculés ; la colonne bleue est le total calculé dans Supabase. Le radar ne change pas le barème du total. Vide une cellule pour enregistrer une valeur non renseignée.</p></div></section>
-</main><dialog id="adminDialog" aria-labelledby="adminTitle"><div class="suivi-head"><h2 id="adminTitle">Administration</h2><button id="closeAdmin" type="button">Fermer</button></div><div style="display:flex;gap:8px;margin:12px 0"><button type="button" id="tabTeachers">Comptes enseignants</button><button type="button" id="tabStudents">Gestion des élèves</button></div><section id="teacherPanel"><p class="muted">Ton compte administrateur est protégé. Les opérations ne modifient pas les résultats des élèves.</p><h3>Créer un enseignant</h3><form id="createTeacher"><input id="newPseudo" aria-label="Pseudo" placeholder="Pseudo" pattern="[a-zA-Z0-9_\-]{3,40}" required autocomplete="off"><input id="newPassword" type="password" aria-label="Mot de passe" placeholder="Mot de passe (12 caractères min.)" minlength="12" required autocomplete="new-password"><button type="submit">Créer le compte</button></form><p id="adminStatus" class="admin-status" role="status" aria-live="polite"></p><div class="suivi-head"><h3>Comptes utilisateurs</h3><button id="reloadAdmin" type="button">Actualiser</button></div><div id="adminUsers"></div><p class="muted">La désactivation bloque les nouvelles connexions et les nouvelles lectures ou modifications des évaluations.</p></section><section id="studentPanel" hidden><h3>Gestion des élèves</h3><p class="muted">Les archives conservent les évaluations. Aucun élève ne sera supprimé ici.</p><form id="createStudent"><input id="studentName" placeholder="Nom de l’élève" aria-label="Nom de l’élève" maxlength="100" required><button>Ajouter (2026-2027)</button></form><p id="studentStatus" role="status" aria-live="polite"></p><div class="suivi-head"><h3>Élèves actifs et archives</h3><button type="button" id="reloadStudents">Actualiser</button></div><div id="adminStudents"></div></section></dialog>
+</main><dialog id="adminDialog" aria-labelledby="adminTitle"><div class="suivi-head"><h2 id="adminTitle">Administration</h2><button id="closeAdmin" type="button">Fermer</button></div><div style="display:flex;gap:8px;margin:12px 0"><button type="button" id="tabTeachers">Comptes enseignants</button><button type="button" id="tabStudents">Gestion des élèves</button></div><section id="teacherPanel"><p class="muted">Ton compte administrateur est protégé. Les opérations ne modifient pas les résultats des élèves.</p><h3>Créer un enseignant</h3><form id="createTeacher"><input id="newPseudo" aria-label="Pseudo" placeholder="Pseudo" pattern="[a-zA-Z0-9_\-]{3,40}" required autocomplete="off"><input id="newPassword" type="password" aria-label="Mot de passe" placeholder="Mot de passe (12 caractères min.)" minlength="12" required autocomplete="new-password"><button type="submit">Créer le compte</button></form><p id="adminStatus" class="admin-status" role="status" aria-live="polite"></p><div class="suivi-head"><h3>Comptes utilisateurs</h3><button id="reloadAdmin" type="button">Actualiser</button></div><div id="adminUsers"></div><p class="muted">La désactivation bloque les nouvelles connexions et les nouvelles lectures ou modifications des évaluations.</p></section><section id="studentPanel" hidden><h3>Gestion des élèves</h3><p class="muted">Les archives conservent les évaluations. Aucun élève ne sera supprimé ici.</p><button type="button" id="archivePdf">Télécharger le dossier PDF de la classe</button><p class="muted">Export des élèves actifs uniquement, sans modification des données.</p><form id="createStudent"><input id="studentName" placeholder="Nom de l’élève" aria-label="Nom de l’élève" maxlength="100" required><button>Ajouter (2026-2027)</button></form><p id="studentStatus" role="status" aria-live="polite"></p><div class="suivi-head"><h3>Élèves actifs et archives</h3><button type="button" id="reloadStudents">Actualiser</button></div><div id="adminStudents"></div></section></dialog>
 <div id="suivi" role="dialog" aria-modal="true" aria-labelledby="suivi-titre"><div class="suivi-card"><div class="suivi-head"><h2 id="suivi-titre">Suivi individuel</h2><button type="button" id="export-eleve">Exporter ce bilan (.xlsx)</button><button type="button" id="export-eleve-pdf">Exporter ce bilan (.pdf)</button><button type="button" id="fermer-suivi">Fermer</button></div><p class="muted">Les résultats sont issus des notes enregistrées dans Supabase. Les mesures sans seuil défini ne sont pas classées en réussite ou échec.</p><div id="suivi-contenu"></div></div></div>
 <script>
 const SUPABASE_URL='https://ghmjtvtdpqwfyuxenmzv.supabase.co';
@@ -349,6 +349,72 @@ document.getElementById('tabTeachers').onclick=()=>{showAdminTab(false);runAdmin
 document.getElementById('tabStudents').onclick=()=>{showAdminTab(true);manageStudents();};
 document.getElementById('reloadStudents').onclick=()=>manageStudents();
 document.getElementById('createStudent').onsubmit=e=>{e.preventDefault();const name=document.getElementById('studentName').value.trim();if(!name)return;manageStudents(()=>db.from('eva_scores').insert({eleve:name,annee_scolaire:'2026-2027',archive:false}).select('id'));};
+
+
+async function exportArchivePdf(){
+ if(!isAdmin||!loggedIn||studentBusy||!adminDialog.open)return;
+ if(!window.jspdf?.jsPDF){studentStatus('Bibliothèque PDF indisponible.');return;}
+ const button=document.getElementById('archivePdf'), epoch=adminEpoch, version=sessionVersion;
+ button.disabled=true;studentStatus('Préparation du dossier PDF…');
+ try{
+ const {data,error}=await db.from('eva_scores').select('*').eq('archive',false).order('id');
+ if(error)throw error;
+ if(epoch!==adminEpoch||version!==sessionVersion||!isAdmin||!loggedIn)return;
+ if(!data?.length)throw new Error('Aucun élève actif.');
+ const previous=allStudents;allStudents=data;
+ try{
+ const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a3',compress:true});
+ pdfHeader(doc,'Dossier collectif — Évaluations PS','Archive des évaluations des élèves actifs');
+ doc.setFontSize(25);doc.text('Dossier de la classe',20,80);
+ doc.setFontSize(16);doc.text('Date : '+new Date().toLocaleDateString('fr-FR'),20,100);doc.text('Effectif : '+data.length+' élèves',20,114);
+ doc.setFontSize(12);doc.text('Tableau général, statistiques et bilans individuels. Document confidentiel.',20,140);
+ doc.addPage();
+  pdfHeader(doc,'Évaluations PS — tableau complet de la classe','Élèves actifs — tableau des résultats');
+ const head=['Élève',...cols.map(f=>labels[f]||f.toUpperCase())];
+ const body=allStudents.map(row=>[row.eleve,...cols.map(f=>isEvaluated(row[f])?String(row[f]):'')]);
+ const width=doc.internal.pageSize.getWidth()-20;
+ const nameWidth=33,scoreWidth=(width-nameWidth)/cols.length;
+ const styles={0:{cellWidth:nameWidth}};
+ cols.forEach((_,i)=>{styles[i+1]={cellWidth:scoreWidth};});
+ doc.autoTable({head:[head],body,startY:36,margin:{left:10,right:10,top:36,bottom:15},theme:'grid',tableWidth:width,
+ styles:{font:'helvetica',fontSize:5.4,cellPadding:0.7,halign:'center',valign:'middle',overflow:'ellipsize',minCellHeight:6},
+ headStyles:{fillColor:[23,74,126],fontSize:5.2},columnStyles:styles,
+ alternateRowStyles:{fillColor:[244,248,252]},
+ didParseCell(data){if(data.column.index===0)data.cell.styles.halign='left';},
+ pageBreak:'avoid'});
+
+ doc.addPage();pdfHeader(doc,'Statistiques de la classe','Les résultats non renseignés sont exclus des moyennes.');
+ pdfTable(doc,['Item','Compétence','Évalués','Non évalués','Moyenne'],cols.filter(f=>!computed.has(f)).map(f=>{const a=itemAverage(f);return [f.toUpperCase(),descriptions[f]||'',String(a.count),String(data.length-a.count),a.average===null?'—':measures.has(f)?a.average.toFixed(2):(radarMean(f)*100).toFixed(1)+' %'];}),{fontSize:9});
+ for(const student of data){doc.addPage();
+  pdfHeader(doc,'Bilan individuel — '+student.eleve,'');
+ const canvas=document.createElement('canvas');renderRadar(canvas,student);
+ const img=canvas.toDataURL('image/png');doc.addImage(img,'PNG',7,41,168,168);
+ doc.setFontSize(8);doc.setTextColor(30,70,110);doc.text('Bleu : '+pdfText(student.eleve),16,215);
+ doc.setTextColor(180,105,30);doc.text('Orange : moyenne de classe',85,215);
+ const rows=cols.filter(f=>!computed.has(f)).map(f=>{
+ const a=itemAverage(f);const mean=a.average===null?'—':measures.has(f)?a.average.toFixed(2).replace('.',','):(radarMean(f)*100).toFixed(1).replace('.',',')+' %';
+ return [f.toUpperCase(),descriptions[f]||'—',scoreLabel(f,student[f]),itemStatus(f,student[f]),mean];
+ });
+ doc.autoTable({head:[['Item','Compétence','Score','État','Moyenne classe']],body:rows,startY:36,
+ margin:{left:180,right:8,top:36,bottom:14},tableWidth:232,theme:'grid',
+ styles:{font:'helvetica',fontSize:7.7,cellPadding:1.15,overflow:'linebreak',valign:'middle',minCellHeight:6},
+ headStyles:{fillColor:[23,74,126]},alternateRowStyles:{fillColor:[244,248,252]},
+ columnStyles:{0:{cellWidth:20},1:{cellWidth:112},2:{cellWidth:21},3:{cellWidth:34},4:{cellWidth:45}},
+ // Les descriptions de toutes les compétences sont cliquables dans le PDF individuel.
+ didDrawCell:(data)=>{
+  if(data.section!=='body'||data.column.index!==1)return;
+  const field=cols.filter(f=>!computed.has(f))[data.row.index];
+  const url=competencyPdfLinks[field];
+  if(url)doc.link(data.cell.x,data.cell.y,data.cell.width,data.cell.height,{url});
+ },
+ pageBreak:'avoid'});
+
+ }
+ pdfFooter(doc);doc.save('archive_PS_'+excelDate()+'.pdf');studentStatus('Dossier PDF généré. Vérifie le fichier avant tout archivage.');
+ }finally{allStudents=previous;}
+ }catch(e){studentStatus('Erreur PDF : '+e.message);}finally{button.disabled=false;}
+}
+document.getElementById('archivePdf').onclick=exportArchivePdf;
 
 renderHeader();updateSession();
 </script>
